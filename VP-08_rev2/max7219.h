@@ -1,0 +1,54 @@
+#ifndef MAX7219_H_
+#define MAX7219_H_
+
+#include <avr/io.h>
+#include <avr/pgmspace.h>
+#include <avr/interrupt.h>
+
+void send_data (uint8_t adress, uint8_t byte);
+void init_max7219 (void);
+void indication (void) ;
+void to_send_led (void);
+void interupt_send (void);
+void send_point (uint8_t point);
+void send_non_point (uint8_t point);
+void blink_simbol (uint8_t namber);
+void blink_many_simbol (uint8_t namber);
+void init_light (void);
+void led_led (void);
+
+
+const uint8_t  tab_seg [60]  PROGMEM = {
+	0x00,0x40,0x20,0x10,0x08,0x04,0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x00,0x00,   // пробел, - ,  ++ использую для светодиодов под символами.
+	0x7E, // 0
+	0x30, // 1
+	0x6D, // 2
+	0x79, // 3
+	0x33, // 4
+	0x5B, // 5
+	0x5F, // 6
+	0x70, // 7
+	0x7F, // 8
+	0x7B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 9
+	0x77, // A
+	0x1F, // B
+	0x4E, // C
+	0x3D, // D
+	0x4F, // E
+	0x47, 0x00, // F
+	0x37, // H
+	0x10, 0x00,0x00, // i
+	0x0E, 0x00, // L
+	0x15, // n
+	0x1D, // o
+	0x67, 0x00, // P
+	0x05, // r
+	0x5B, // S
+	0x0F, // t
+	0x1C, 0x3E, 0x00, 0x00,// u, V
+    0x3B // Y
+	
+};
+
+
+#endif /* MAX7219_H_ */
