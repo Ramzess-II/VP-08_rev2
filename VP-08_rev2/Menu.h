@@ -6,7 +6,7 @@
 #include <avr/pgmspace.h>
 #include <string.h>
 
-enum {                  // перечисления разных обработчиков клавиш в меню
+enum {                  // РїРµСЂРµС‡РёСЃР»РµРЅРёСЏ СЂР°Р·РЅС‹С… РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РєР»Р°РІРёС€ РІ РјРµРЅСЋ
      NUL_PTR,            
      SKROL_MENU = 1,
      DATA_INPUT,
@@ -15,7 +15,7 @@ enum {                  // перечисления разных обработчиков клавиш в меню
 
 };
 
-enum {                    // перечисление пунктов меню
+enum {                    // РїРµСЂРµС‡РёСЃР»РµРЅРёРµ РїСѓРЅРєС‚РѕРІ РјРµРЅСЋ
      PAR1,
      PAR1_1,
      PAR1_2,
@@ -51,7 +51,7 @@ enum {                    // перечисление пунктов меню
      PAR7,
 };
 
-enum                              // перечисление ерроров
+enum                              // РїРµСЂРµС‡РёСЃР»РµРЅРёРµ РµСЂСЂРѕСЂРѕРІ
 {
      ERROR0,
      ERROR1,
@@ -66,7 +66,7 @@ enum                              // перечисление ерроров
      BAT,
 };
 
-struct parametrs {                // структура с параметрами
+struct parametrs {                // СЃС‚СЂСѓРєС‚СѓСЂР° СЃ РїР°СЂР°РјРµС‚СЂР°РјРё
      uint32_t caunter_weight;
      uint8_t discret1 ;
      uint8_t discret2 ;
@@ -134,19 +134,19 @@ struct metrologis {
               
      };
 
-// строки с выводимыми ерорами
+// СЃС‚СЂРѕРєРё СЃ РІС‹РІРѕРґРёРјС‹РјРё РµСЂРѕСЂР°РјРё
 const char er_string0[] PROGMEM = "ERR0";    // 
-const char er_string1[] PROGMEM = "ERR1";    // превышение нпв
+const char er_string1[] PROGMEM = "ERR1";    // РїСЂРµРІС‹С€РµРЅРёРµ РЅРїРІ
 const char er_string2[] PROGMEM = "ERR2";
 const char er_string3[] PROGMEM = "ERR3";
-const char er_string4[] PROGMEM = "ERR4";    // ошибка датчиков (адресация. калибровка)
-const char er_string5[] PROGMEM = "ERR5";    // не верное значение
+const char er_string4[] PROGMEM = "ERR4";    // РѕС€РёР±РєР° РґР°С‚С‡РёРєРѕРІ (Р°РґСЂРµСЃР°С†РёСЏ. РєР°Р»РёР±СЂРѕРІРєР°)
+const char er_string5[] PROGMEM = "ERR5";    // РЅРµ РІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 const char er_string6[] PROGMEM = "ERR6";    // 
-const char er_string7[] PROGMEM = "ERR36";   //оплата
+const char er_string7[] PROGMEM = "ERR36";   //РѕРїР»Р°С‚Р°
 const char er_string8[] PROGMEM = " -YES-";
 const char er_string9[] PROGMEM = " -NO- ";
 const char er_string10[] PROGMEM = " BAT  ";
-// а это массив указателей на строки
+// Р° СЌС‚Рѕ РјР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° СЃС‚СЂРѕРєРё
 const char *const error_string[] PROGMEM = {
      [ERROR0] = er_string0,
      [ERROR1] = er_string1,
@@ -161,7 +161,7 @@ const char *const error_string[] PROGMEM = {
      [BAT] = er_string10,
   };
 
-// функции из меню, разбиты по группам, но это не точно
+// С„СѓРЅРєС†РёРё РёР· РјРµРЅСЋ, СЂР°Р·Р±РёС‚С‹ РїРѕ РіСЂСѓРїРїР°Рј, РЅРѕ СЌС‚Рѕ РЅРµ С‚РѕС‡РЅРѕ
 void main_menu (void);
 void _key_strob (void);
 void enter_numbers (uint8_t size );

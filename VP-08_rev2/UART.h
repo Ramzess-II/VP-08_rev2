@@ -54,7 +54,7 @@ struct bool_date {
   };
 
 
-enum                  // перечисление скоростей юарта
+enum                  // РїРµСЂРµС‡РёСЃР»РµРЅРёРµ СЃРєРѕСЂРѕСЃС‚РµР№ СЋР°СЂС‚Р°
 {
      B19200 = 51,
      B9600 = 103,
@@ -62,7 +62,7 @@ enum                  // перечисление скоростей юарта
      B600 =  1666,
 };
 
-enum                  // это посылки которые запишем во флеш
+enum                  // СЌС‚Рѕ РїРѕСЃС‹Р»РєРё РєРѕС‚РѕСЂС‹Рµ Р·Р°РїРёС€РµРј РІРѕ С„Р»РµС€
 {
      S98_MSV,
      S01,
@@ -88,8 +88,8 @@ enum                  // это посылки которые запишем во флеш
      
 };
 
-// собственно их объявление
-const char uart_string1[]  PROGMEM =  {0x53,0x39,0x38,0x3B,0x4D,0x53,0x56,0x3F,0x31,0x3B,0x24,0x00};     //;S98;MSV?1; это в вп. а по факту S98;MSV?1; +$
+// СЃРѕР±СЃС‚РІРµРЅРЅРѕ РёС… РѕР±СЉВ¤РІР»РµРЅРёРµ
+const char uart_string1[]  PROGMEM =  {0x53,0x39,0x38,0x3B,0x4D,0x53,0x56,0x3F,0x31,0x3B,0x24,0x00};     //;S98;MSV?1; СЌС‚Рѕ РІ РІРї. Р° РїРѕ С„Р°РєС‚Сѓ S98;MSV?1; +$
 const char uart_string2[]  PROGMEM =  {0x53,0x30,0x31,0x3B,0x24,0x00};      // S01;
 const char uart_string3[]  PROGMEM =  {0x53,0x30,0x32,0x3B,0x24,0x00};      // S02;
 const char uart_string4[]  PROGMEM =  {0x53,0x30,0x33,0x3B,0x24,0x00};      // S03;
@@ -103,12 +103,12 @@ const char uart_string11[] PROGMEM =  {0x53,0x31,0x30,0x3B,0x24,0x00};      // S
 const char uart_string12[] PROGMEM =  {0x53,0x31,0x31,0x3B,0x24,0x00};      // S11; 
 const char uart_string13[] PROGMEM =  {0x53,0x31,0x32,0x3B,0x24,0x00};      // S12; 
 const char uart_string14[] PROGMEM =  {";S98;TDD1;$"};      // TDD;      
-const char uart_string15[] PROGMEM =  {0x02,0x41,0x4F,0x4B,0x34,0x35,0x03,0x24,0x00};           // AOK   обнуление удачно
-const char uart_string16[] PROGMEM =  {0x02,0x41,0x4E,0x4F,0x4B,0x30,0x42,0x03,0x24,0x00};      // ANOK  обнуление не удачно             ????????? 0x30, 0x42 --- 0B???
-const char uart_string17[] PROGMEM =  {0x02,0x54,0x4F,0x4B,0x35,0x30,0x03,0x24,0x00};           // TOK   тара удачно            tik-tok axaxa
-const char uart_string18[] PROGMEM =  {0x02,0x54,0x4E,0x4F,0x4B,0x31,0x45,0x03,0x24,0x00};      // TNOK  тара не удачно               
-const char uart_string19[] PROGMEM =  {0x02,0x58,0x4F,0x4B,0x35,0x43,0x03,0x24,0x00};           // XOK   отмена тары удачно            
-const char uart_string20[] PROGMEM =  {0x02,0x58,0x4E,0x4F,0x4B,0x31,0x32,0x03,0x24,0x00};      // XNOK  отмена тары не удачно   
+const char uart_string15[] PROGMEM =  {0x02,0x41,0x4F,0x4B,0x34,0x35,0x03,0x24,0x00};           // AOK   РѕР±РЅСѓР»РµРЅРёРµ СѓРґР°С‡РЅРѕ
+const char uart_string16[] PROGMEM =  {0x02,0x41,0x4E,0x4F,0x4B,0x30,0x42,0x03,0x24,0x00};      // ANOK  РѕР±РЅСѓР»РµРЅРёРµ РЅРµ СѓРґР°С‡РЅРѕ             ????????? 0x30, 0x42 --- 0B???
+const char uart_string17[] PROGMEM =  {0x02,0x54,0x4F,0x4B,0x35,0x30,0x03,0x24,0x00};           // TOK   С‚Р°СЂР° СѓРґР°С‡РЅРѕ            tik-tok axaxa
+const char uart_string18[] PROGMEM =  {0x02,0x54,0x4E,0x4F,0x4B,0x31,0x45,0x03,0x24,0x00};      // TNOK  С‚Р°СЂР° РЅРµ СѓРґР°С‡РЅРѕ               
+const char uart_string19[] PROGMEM =  {0x02,0x58,0x4F,0x4B,0x35,0x43,0x03,0x24,0x00};           // XOK   РѕС‚РјРµРЅР° С‚Р°СЂС‹ СѓРґР°С‡РЅРѕ            
+const char uart_string20[] PROGMEM =  {0x02,0x58,0x4E,0x4F,0x4B,0x31,0x32,0x03,0x24,0x00};      // XNOK  РѕС‚РјРµРЅР° С‚Р°СЂС‹ РЅРµ СѓРґР°С‡РЅРѕ   
                     
        
      
@@ -134,6 +134,6 @@ const char *const uart_string[] PROGMEM = {
      [XOK]  = uart_string19,      
      [XNOK] = uart_string20,                     
 };
-// в конце каждой строки на отправку есть специальный символ $, который означает что мы передали всю строку
+// РІ РєРѕРЅС†Рµ РєР°Р¶РґРѕР№ СЃС‚СЂРѕРєРё РЅР° РѕС‚РїСЂР°РІРєСѓ РµСЃС‚СЊ СЃРїРµС†РёР°Р»СЊРЅС‹Р№ СЃРёРјРІРѕР» $, РєРѕС‚РѕСЂС‹Р№ РѕР·РЅР°С‡Р°РµС‚ С‡С‚Рѕ РјС‹ РїРµСЂРµРґР°Р»Рё РІСЃСЋ СЃС‚СЂРѕРєСѓ
 
 #endif /* UART_H_ */

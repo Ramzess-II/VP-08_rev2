@@ -7,7 +7,7 @@
 #include "EEprom.h"
 #include "main.h"
 
-//--------------переменные из других файлов---------------//
+//--------------РїРµСЂРµРјРµРЅРЅС‹Рµ РёР· РґСЂСѓРіРёС… С„Р°Р№Р»РѕРІ---------------//
 extern bool spi_stop;
 extern uint8_t main_menu_bool,data_ok;
 extern uint16_t tim_0,tim_1,tim_3,tim_4,tim_5, adc;
@@ -15,23 +15,23 @@ extern int32_t massa,last_massa;
 extern  char send_buf [20];
 extern struct DS1307 DS;
 extern struct bool_date boolean;
-//--------------переменные из этого файла-----------------//
+//--------------РїРµСЂРµРјРµРЅРЅС‹Рµ РёР· СЌС‚РѕРіРѕ С„Р°Р№Р»Р°-----------------//
 bool go_func, change_item, non_repit,super_parol, admin_parol;   
 uint8_t nul_enty = 0, mirror_data_8bit;
 int32_t mirror_data;
 double mirror_double, mirror_double2;             
-void(* on_clicks)(void);                    // создаем указатель на функцию
-typedef void (*StateFunc) (void);           // создаем новый тип, теперь StateFunc указатель на void (*) (void);
+void(* on_clicks)(void);                    // СЃРѕР·РґР°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С„СѓРЅРєС†РёСЋ
+typedef void (*StateFunc) (void);           // СЃРѕР·РґР°РµРј РЅРѕРІС‹Р№ С‚РёРї, С‚РµРїРµСЂСЊ StateFunc СѓРєР°Р·Р°С‚РµР»СЊ РЅР° void (*) (void);
 struct parametrs param;
 struct metrologis metrology;
-double *point_metrologi;                    // указатель на элемент структуры
+double *point_metrologi;                    // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЌР»РµРјРµРЅС‚ СЃС‚СЂСѓРєС‚СѓСЂС‹
 
 
 
 
-typedef struct  PROGMEM {               // структура меню
-	const char format[10];			    // Имя меню
-	void(* on_click)(void);      	    // Ссылка на функцию вызова обрабоки изменения значения, параметр +1 или -1)
+typedef struct  PROGMEM {               // СЃС‚СЂСѓРєС‚СѓСЂР° РјРµРЅСЋ
+	const char format[10];			    // РРјСЏ РјРµРЅСЋ
+	void(* on_click)(void);      	    // РЎСЃС‹Р»РєР° РЅР° С„СѓРЅРєС†РёСЋ РІС‹Р·РѕРІР° РѕР±СЂР°Р±РѕРєРё РёР·РјРµРЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ, РїР°СЂР°РјРµС‚СЂ +1 РёР»Рё -1)
 	uint8_t current_menu;
 	uint8_t child_menu;
 	uint8_t parent_menu;
@@ -40,10 +40,10 @@ typedef struct  PROGMEM {               // структура меню
 	uint8_t  key_state;
 } MenuItem;
 
-MenuItem *pointer_menu ;                 //*pointer_menu указатель на структуру MenuItem
+MenuItem *pointer_menu ;                 //*pointer_menu СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂСѓРєС‚СѓСЂСѓ MenuItem
 
-MenuItem const MenuItems[40] = {         // создаем массив структур меню
-	//  номер         название     функция                           имя меню             ребенок        родитель      след_пункт      пред_пункт     обработка клавиш
+MenuItem const MenuItems[40] = {         // СЃРѕР·РґР°РµРј РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РјРµРЅСЋ
+	//  РЅРѕРјРµСЂ         РЅР°Р·РІР°РЅРёРµ     С„СѓРЅРєС†РёСЏ                           РёРјСЏ РјРµРЅСЋ             СЂРµР±РµРЅРѕРє        СЂРѕРґРёС‚РµР»СЊ      СЃР»РµРґ_РїСѓРЅРєС‚      РїСЂРµРґ_РїСѓРЅРєС‚     РѕР±СЂР°Р±РѕС‚РєР° РєР»Р°РІРёС€
 	
 	[PAR1]       =  {"PAR1",          &void_func,   	               PAR1,              PAR1_1,        PAR1 ,          PAR2 ,         PAR7 ,             SKROL_MENU },
 	[PAR1_1]     =  {"PAR1.1",        &ver_po,                         PAR1_1,            NUL_PTR,       PAR1 ,          PAR1_2 ,       PAR1_3 ,           DATA_INPUT },
@@ -80,89 +80,89 @@ MenuItem const MenuItems[40] = {         // создаем массив структур меню
     [PAR7]       =  {"PAR7",          &enter_no_pay,   	               PAR7,              NUL_PTR,       PAR7 ,          PAR1 ,         PAR6 ,             NO_CHILDREN },         
 };
 
-void main_menu (void)                // функция меин меню
+void main_menu (void)                // С„СѓРЅРєС†РёСЏ РјРµРёРЅ РјРµРЅСЋ
 {
-	_key_strob ();                   // отслеживание кнопок
-	if (go_func) { on_clicks ();}    // если поднят флаг что мы выполняем функции, то выполнять функцию указатель на которую хранится в массиве структур меню
-	else	strcpy_P(send_buf, pointer_menu->format );     // если флаг опущен то показывать имя меню 
+	_key_strob ();                   // РѕС‚СЃР»РµР¶РёРІР°РЅРёРµ РєРЅРѕРїРѕРє
+	if (go_func) { on_clicks ();}    // РµСЃР»Рё РїРѕРґРЅСЏС‚ С„Р»Р°Рі С‡С‚Рѕ РјС‹ РІС‹РїРѕР»РЅСЏРµРј С„СѓРЅРєС†РёРё, С‚Рѕ РІС‹РїРѕР»РЅСЏС‚СЊ С„СѓРЅРєС†РёСЋ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕС‚РѕСЂСѓСЋ С…СЂР°РЅРёС‚СЃСЏ РІ РјР°СЃСЃРёРІРµ СЃС‚СЂСѓРєС‚СѓСЂ РјРµРЅСЋ
+	else	strcpy_P(send_buf, pointer_menu->format );     // РµСЃР»Рё С„Р»Р°Рі РѕРїСѓС‰РµРЅ С‚Рѕ РїРѕРєР°Р·С‹РІР°С‚СЊ РёРјСЏ РјРµРЅСЋ 
 }
 
-uint8_t not_change (void)            // проверка на введеные пароли
+uint8_t not_change (void)            // РїСЂРѕРІРµСЂРєР° РЅР° РІРІРµРґРµРЅС‹Рµ РїР°СЂРѕР»Рё
 {
-   if (super_parol) {return 1;}      // если это супер пароль, сразу доступ
-   else if (admin_parol && BLK) {return 1;}     // если пароль админа то еще проверяем блокировку
-   else {return 0; }                 // если ничего то вернуть 0
+   if (super_parol) {return 1;}      // РµСЃР»Рё СЌС‚Рѕ СЃСѓРїРµСЂ РїР°СЂРѕР»СЊ, СЃСЂР°Р·Сѓ РґРѕСЃС‚СѓРї
+   else if (admin_parol && BLK) {return 1;}     // РµСЃР»Рё РїР°СЂРѕР»СЊ Р°РґРјРёРЅР° С‚Рѕ РµС‰Рµ РїСЂРѕРІРµСЂСЏРµРј Р±Р»РѕРєРёСЂРѕРІРєСѓ
+   else {return 0; }                 // РµСЃР»Рё РЅРёС‡РµРіРѕ С‚Рѕ РІРµСЂРЅСѓС‚СЊ 0
 }
 
-void _key_strob (void)               // функция обработки клавиш в меню
+void _key_strob (void)               // С„СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё РєР»Р°РІРёС€ РІ РјРµРЅСЋ
 {
-	switch ((pgm_read_byte(&pointer_menu->key_state)))      // сюда передаем считаный из массива структур меню номер, и в зависимости от того какой это номер по разному обрабатываем клавиши
+	switch ((pgm_read_byte(&pointer_menu->key_state)))      // СЃСЋРґР° РїРµСЂРµРґР°РµРј СЃС‡РёС‚Р°РЅС‹Р№ РёР· РјР°СЃСЃРёРІР° СЃС‚СЂСѓРєС‚СѓСЂ РјРµРЅСЋ РЅРѕРјРµСЂ, Рё РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ РєР°РєРѕР№ СЌС‚Рѕ РЅРѕРјРµСЂ РїРѕ СЂР°Р·РЅРѕРјСѓ РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РєР»Р°РІРёС€Рё
 	{
-		case (SKROL_MENU):                                  // если это прокрутка меню
-		if (button_press (KEY_UP)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->next_menu))]); }       // при нажатии на кнопку переходим в пункт меню который указан как следующий
-		if (button_press (KEY_DOWN)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->previos_menu))]); }  // как предыдущий
-		if (button_press (KEY_ENTER)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->child_menu))]);  }  // переходим к ребенку
+		case (SKROL_MENU):                                  // РµСЃР»Рё СЌС‚Рѕ РїСЂРѕРєСЂСѓС‚РєР° РјРµРЅСЋ
+		if (button_press (KEY_UP)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->next_menu))]); }       // РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° РєРЅРѕРїРєСѓ РїРµСЂРµС…РѕРґРёРј РІ РїСѓРЅРєС‚ РјРµРЅСЋ РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·Р°РЅ РєР°Рє СЃР»РµРґСѓСЋС‰РёР№
+		if (button_press (KEY_DOWN)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->previos_menu))]); }  // РєР°Рє РїСЂРµРґС‹РґСѓС‰РёР№
+		if (button_press (KEY_ENTER)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->child_menu))]);  }  // РїРµСЂРµС…РѕРґРёРј Рє СЂРµР±РµРЅРєСѓ
 		if (button_press (KEY_ESC))  { if(((&MenuItems[(pgm_read_byte(&pointer_menu->parent_menu))]) == (&MenuItems[(pgm_read_byte(&pointer_menu->current_menu))])))\
             { boolean.main_menu_bool = 0;  }else {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->parent_menu))]) ;}}  
-        // тут мы проверяем если у пункта имя родителя совпадает с именем меню, то выходим из меню, а если не совпадает то переходим к родителю.     
+        // С‚СѓС‚ РјС‹ РїСЂРѕРІРµСЂСЏРµРј РµСЃР»Рё Сѓ РїСѓРЅРєС‚Р° РёРјСЏ СЂРѕРґРёС‚РµР»СЏ СЃРѕРІРїР°РґР°РµС‚ СЃ РёРјРµРЅРµРј РјРµРЅСЋ, С‚Рѕ РІС‹С…РѕРґРёРј РёР· РјРµРЅСЋ, Р° РµСЃР»Рё РЅРµ СЃРѕРІРїР°РґР°РµС‚ С‚Рѕ РїРµСЂРµС…РѕРґРёРј Рє СЂРѕРґРёС‚РµР»СЋ.     
 		break;
-		case (DATA_INPUT):                                   // если это ввод данных
-		if (!go_func){                                       // и функция меню не выполняется
-			if (button_press (KEY_UP)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->next_menu))]); }       // при нажатии на кнопку переходим в пункт меню который указан как следующий
-			if (button_press (KEY_DOWN)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->previos_menu))]); }  // как предыдущий
-			if (button_press (KEY_ESC)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->parent_menu))]); boolean.led_in_menu = false;}     // возвращаемся к родителю
-			if (button_press (KEY_ENTER)) {on_clicks = (StateFunc)  pgm_read_ptr(&MenuItems[(pgm_read_byte(&pointer_menu->current_menu))].on_click);  go_func = true;}  // начинаем выполнять функцию меню
+		case (DATA_INPUT):                                   // РµСЃР»Рё СЌС‚Рѕ РІРІРѕРґ РґР°РЅРЅС‹С…
+		if (!go_func){                                       // Рё С„СѓРЅРєС†РёСЏ РјРµРЅСЋ РЅРµ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ
+			if (button_press (KEY_UP)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->next_menu))]); }       // РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° РєРЅРѕРїРєСѓ РїРµСЂРµС…РѕРґРёРј РІ РїСѓРЅРєС‚ РјРµРЅСЋ РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·Р°РЅ РєР°Рє СЃР»РµРґСѓСЋС‰РёР№
+			if (button_press (KEY_DOWN)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->previos_menu))]); }  // РєР°Рє РїСЂРµРґС‹РґСѓС‰РёР№
+			if (button_press (KEY_ESC)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->parent_menu))]); boolean.led_in_menu = false;}     // РІРѕР·РІСЂР°С‰Р°РµРјСЃСЏ Рє СЂРѕРґРёС‚РµР»СЋ
+			if (button_press (KEY_ENTER)) {on_clicks = (StateFunc)  pgm_read_ptr(&MenuItems[(pgm_read_byte(&pointer_menu->current_menu))].on_click);  go_func = true;}  // РЅР°С‡РёРЅР°РµРј РІС‹РїРѕР»РЅСЏС‚СЊ С„СѓРЅРєС†РёСЋ РјРµРЅСЋ
 		}
-		if (go_func){                                                                                                         // если мы находимся в выполнении функции
-			if (change_item) if (button_press (KEY_ESC)) {  change_item = false; non_repit = false; boolean.led_display = 0;*point_metrologi = mirror_double2;boolean.led_in_menu = false;} // если мы изменяли параметры то по ескейпу перестаем это делать
-			if (!change_item){                                                                                                // если мы изменяем параметры
-				if (button_press (KEY_ESC)) { go_func = false; boolean.non_rep = false;boolean.led_display = 0; boolean.led_in_menu = false;}	          // если мы не изменяем параметры то по ескейпу выходим
-			}                              // плюс два костыля, без них не работает ввод коэф для каждого датчика
+		if (go_func){                                                                                                         // РµСЃР»Рё РјС‹ РЅР°С…РѕРґРёРјСЃСЏ РІ РІС‹РїРѕР»РЅРµРЅРёРё С„СѓРЅРєС†РёРё
+			if (change_item) if (button_press (KEY_ESC)) {  change_item = false; non_repit = false; boolean.led_display = 0;*point_metrologi = mirror_double2;boolean.led_in_menu = false;} // РµСЃР»Рё РјС‹ РёР·РјРµРЅСЏР»Рё РїР°СЂР°РјРµС‚СЂС‹ С‚Рѕ РїРѕ РµСЃРєРµР№РїСѓ РїРµСЂРµСЃС‚Р°РµРј СЌС‚Рѕ РґРµР»Р°С‚СЊ
+			if (!change_item){                                                                                                // РµСЃР»Рё РјС‹ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹
+				if (button_press (KEY_ESC)) { go_func = false; boolean.non_rep = false;boolean.led_display = 0; boolean.led_in_menu = false;}	          // РµСЃР»Рё РјС‹ РЅРµ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ С‚Рѕ РїРѕ РµСЃРєРµР№РїСѓ РІС‹С…РѕРґРёРј
+			}                              // РїР»СЋСЃ РґРІР° РєРѕСЃС‚С‹Р»СЏ, Р±РµР· РЅРёС… РЅРµ СЂР°Р±РѕС‚Р°РµС‚ РІРІРѕРґ РєРѕСЌС„ РґР»СЏ РєР°Р¶РґРѕРіРѕ РґР°С‚С‡РёРєР°
 		}
 		break;
-		case (NO_CHILDREN):                                   // если это ввод данных без захода в функцию
-		if (!go_func){                                       // и функция меню не выполняется
-     		if (button_press (KEY_UP)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->next_menu))]); }       // при нажатии на кнопку переходим в пункт меню который указан как следующий
-     		if (button_press (KEY_DOWN)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->previos_menu))]); }  // как предыдущий
-     		if (button_press (KEY_ESC))  {boolean.main_menu_bool = 0; }                              // если нажали ескейп покинули меню
-     		if (button_press (KEY_ENTER)) {on_clicks = (StateFunc)  pgm_read_ptr(&MenuItems[(pgm_read_byte(&pointer_menu->current_menu))].on_click);  go_func = true;}  // начинаем выполнять функцию меню
+		case (NO_CHILDREN):                                   // РµСЃР»Рё СЌС‚Рѕ РІРІРѕРґ РґР°РЅРЅС‹С… Р±РµР· Р·Р°С…РѕРґР° РІ С„СѓРЅРєС†РёСЋ
+		if (!go_func){                                       // Рё С„СѓРЅРєС†РёСЏ РјРµРЅСЋ РЅРµ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ
+     		if (button_press (KEY_UP)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->next_menu))]); }       // РїСЂРё РЅР°Р¶Р°С‚РёРё РЅР° РєРЅРѕРїРєСѓ РїРµСЂРµС…РѕРґРёРј РІ РїСѓРЅРєС‚ РјРµРЅСЋ РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·Р°РЅ РєР°Рє СЃР»РµРґСѓСЋС‰РёР№
+     		if (button_press (KEY_DOWN)) {pointer_menu =((MenuItem*)&MenuItems[(pgm_read_byte(&pointer_menu->previos_menu))]); }  // РєР°Рє РїСЂРµРґС‹РґСѓС‰РёР№
+     		if (button_press (KEY_ESC))  {boolean.main_menu_bool = 0; }                              // РµСЃР»Рё РЅР°Р¶Р°Р»Рё РµСЃРєРµР№Рї РїРѕРєРёРЅСѓР»Рё РјРµРЅСЋ
+     		if (button_press (KEY_ENTER)) {on_clicks = (StateFunc)  pgm_read_ptr(&MenuItems[(pgm_read_byte(&pointer_menu->current_menu))].on_click);  go_func = true;}  // РЅР°С‡РёРЅР°РµРј РІС‹РїРѕР»РЅСЏС‚СЊ С„СѓРЅРєС†РёСЋ РјРµРЅСЋ
 		}
-		if (go_func){                                                                                                         // если мы находимся в выполнении функции
-     		if (change_item) if (button_press (KEY_ESC)) {  change_item = false; non_repit = false; }                         // если мы изменяли параметры то по ескейпу перестаем это делать
-     		if (!change_item){                                                                                                // если мы изменяем параметры
-          		if (button_press (KEY_ESC)) { go_func = false; boolean.change_item_mirr = false;}	                          // если мы не изменяем параметры то по ескейпу выходим
+		if (go_func){                                                                                                         // РµСЃР»Рё РјС‹ РЅР°С…РѕРґРёРјСЃСЏ РІ РІС‹РїРѕР»РЅРµРЅРёРё С„СѓРЅРєС†РёРё
+     		if (change_item) if (button_press (KEY_ESC)) {  change_item = false; non_repit = false; }                         // РµСЃР»Рё РјС‹ РёР·РјРµРЅСЏР»Рё РїР°СЂР°РјРµС‚СЂС‹ С‚Рѕ РїРѕ РµСЃРєРµР№РїСѓ РїРµСЂРµСЃС‚Р°РµРј СЌС‚Рѕ РґРµР»Р°С‚СЊ
+     		if (!change_item){                                                                                                // РµСЃР»Рё РјС‹ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹
+          		if (button_press (KEY_ESC)) { go_func = false; boolean.change_item_mirr = false;}	                          // РµСЃР»Рё РјС‹ РЅРµ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ С‚Рѕ РїРѕ РµСЃРєРµР№РїСѓ РІС‹С…РѕРґРёРј
      		}
 		}
 		break;        
 	}
 }
 
-void ver_po (void)                   // показать версию ПО. пока топорно
+void ver_po (void)                   // РїРѕРєР°Р·Р°С‚СЊ РІРµСЂСЃРёСЋ РџРћ. РїРѕРєР° С‚РѕРїРѕСЂРЅРѕ
 {
-	sprintf(send_buf, "UER1.00" );   // печатаем версию
+	sprintf(send_buf, "UER1.00" );   // РїРµС‡Р°С‚Р°РµРј РІРµСЂСЃРёСЋ
 }
 
-void send_adc (void)                 // показать напряжение АКБ в вольтах
+void send_adc (void)                 // РїРѕРєР°Р·Р°С‚СЊ РЅР°РїСЂСЏР¶РµРЅРёРµ РђРљР‘ РІ РІРѕР»СЊС‚Р°С…
 {
     static uint8_t caunter_filtr;
     static double filtrs_adc [10];
-    static double n;        // создали дабл переменную для хранения промежуточного вычисления
+    static double n;        // СЃРѕР·РґР°Р»Рё РґР°Р±Р» РїРµСЂРµРјРµРЅРЅСѓСЋ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕРіРѕ РІС‹С‡РёСЃР»РµРЅРёСЏ
 	if (tim_1 == 0) {  
     filtrs_adc[caunter_filtr] = (double) adc / 71;   
     for (int i = 0; i < 10; i ++) { n += filtrs_adc[i];}  
     n = n / 10;  
     caunter_filtr ++;   
     if (caunter_filtr == 10 )  caunter_filtr = 0;        
-	sprintf (send_buf, "BAT%04.1f" ,  n );   // функция вывода 
-	if(filtrs_adc [9] == 0) {tim_1 = 500;} else {tim_1 = 5000;}}          // пока в последнем символе 0 очень быстро набрать
+	sprintf (send_buf, "BAT%04.1f" ,  n );   // С„СѓРЅРєС†РёСЏ РІС‹РІРѕРґР° 
+	if(filtrs_adc [9] == 0) {tim_1 = 500;} else {tim_1 = 5000;}}          // РїРѕРєР° РІ РїРѕСЃР»РµРґРЅРµРј СЃРёРјРІРѕР»Рµ 0 РѕС‡РµРЅСЊ Р±С‹СЃС‚СЂРѕ РЅР°Р±СЂР°С‚СЊ
 }
 
-void caunter_weighing (void)         // счетчик взвешиваний пока не реализовано
+void caunter_weighing (void)         // СЃС‡РµС‚С‡РёРє РІР·РІРµС€РёРІР°РЅРёР№ РїРѕРєР° РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅРѕ
 {
 	sprintf(send_buf, "%06lu" , (uint32_t) param.caunter_weight );
 }
 
-void diskret1_new (void)             // функция ввода дискрета новая, где можно просто перебирать значения а не вводить
+void diskret1_new (void)             // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РґРёСЃРєСЂРµС‚Р° РЅРѕРІР°СЏ, РіРґРµ РјРѕР¶РЅРѕ РїСЂРѕСЃС‚Рѕ РїРµСЂРµР±РёСЂР°С‚СЊ Р·РЅР°С‡РµРЅРёСЏ Р° РЅРµ РІРІРѕРґРёС‚СЊ
 {
    input_discret (&param.discret1,1);
 }
@@ -179,11 +179,11 @@ void discret3 (void)
 
 void input_discret (uint8_t *inbaud, uint8_t nomer)
 {
-      if (!change_item){                    // это флаг того что мы изменяем параметры или нет
-      if (button_press (KEY_ENTER)) {change_item = true;}         // пока не изменяем параметры отслеживаем кнопку ентер, как только нажали поднимаем флаг что мы изменяем параметры
-           sprintf(send_buf, "   %03lu" , (uint32_t) *inbaud ); // пока не изменяем выводим текущее значение параметра на экран
-           switch (*inbaud){                                    // тупая функция но все же. сюда передаем значение хранящиеся в памяти и в зависимости от этого присваиваем промежуточной переменной   
-                case 1:   mirror_data_8bit = 0; break;          // значение из кейсов для того чтоб при входе в изменение показывали текущий пункт перед изменением а не нулевой!
+      if (!change_item){                    // СЌС‚Рѕ С„Р»Р°Рі С‚РѕРіРѕ С‡С‚Рѕ РјС‹ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РёР»Рё РЅРµС‚
+      if (button_press (KEY_ENTER)) {change_item = true;}         // РїРѕРєР° РЅРµ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РѕС‚СЃР»РµР¶РёРІР°РµРј РєРЅРѕРїРєСѓ РµРЅС‚РµСЂ, РєР°Рє С‚РѕР»СЊРєРѕ РЅР°Р¶Р°Р»Рё РїРѕРґРЅРёРјР°РµРј С„Р»Р°Рі С‡С‚Рѕ РјС‹ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹
+           sprintf(send_buf, "   %03lu" , (uint32_t) *inbaud ); // РїРѕРєР° РЅРµ РёР·РјРµРЅСЏРµРј РІС‹РІРѕРґРёРј С‚РµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° РЅР° СЌРєСЂР°РЅ
+           switch (*inbaud){                                    // С‚СѓРїР°СЏ С„СѓРЅРєС†РёСЏ РЅРѕ РІСЃРµ Р¶Рµ. СЃСЋРґР° РїРµСЂРµРґР°РµРј Р·РЅР°С‡РµРЅРёРµ С…СЂР°РЅСЏС‰РёРµСЃСЏ РІ РїР°РјСЏС‚Рё Рё РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЌС‚РѕРіРѕ РїСЂРёСЃРІР°РёРІР°РµРј РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№   
+                case 1:   mirror_data_8bit = 0; break;          // Р·РЅР°С‡РµРЅРёРµ РёР· РєРµР№СЃРѕРІ РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР± РїСЂРё РІС…РѕРґРµ РІ РёР·РјРµРЅРµРЅРёРµ РїРѕРєР°Р·С‹РІР°Р»Рё С‚РµРєСѓС‰РёР№ РїСѓРЅРєС‚ РїРµСЂРµРґ РёР·РјРµРЅРµРЅРёРµРј Р° РЅРµ РЅСѓР»РµРІРѕР№!
                 case 2:   mirror_data_8bit = 1; break;
                 case 5:   mirror_data_8bit = 2; break;
                 case 10:  mirror_data_8bit = 3; break;
@@ -193,10 +193,10 @@ void input_discret (uint8_t *inbaud, uint8_t nomer)
                 case 200: mirror_data_8bit = 7; break;
            }
       }
-      if (change_item){                                                // теперь если мы изменяем параметры
-           if (button_press (KEY_UP)) { if (mirror_data_8bit < 8) mirror_data_8bit ++;  }   // отслеживаем кнопку вверх и пока промежуточное значение меньше 8 плюсуем его
-           if (button_press (KEY_DOWN)) {if (mirror_data_8bit > 0) mirror_data_8bit --; }   // ну или же минусуем
-           switch (mirror_data_8bit){                                                       // в зависимости от того до куда доклацали нашу переменную присваиваем новое значение из кейса
+      if (change_item){                                                // С‚РµРїРµСЂСЊ РµСЃР»Рё РјС‹ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹
+           if (button_press (KEY_UP)) { if (mirror_data_8bit < 8) mirror_data_8bit ++;  }   // РѕС‚СЃР»РµР¶РёРІР°РµРј РєРЅРѕРїРєСѓ РІРІРµСЂС… Рё РїРѕРєР° РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РјРµРЅСЊС€Рµ 8 РїР»СЋСЃСѓРµРј РµРіРѕ
+           if (button_press (KEY_DOWN)) {if (mirror_data_8bit > 0) mirror_data_8bit --; }   // РЅСѓ РёР»Рё Р¶Рµ РјРёРЅСѓСЃСѓРµРј
+           switch (mirror_data_8bit){                                                       // РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ РґРѕ РєСѓРґР° РґРѕРєР»Р°С†Р°Р»Рё РЅР°С€Сѓ РїРµСЂРµРјРµРЅРЅСѓСЋ РїСЂРёСЃРІР°РёРІР°РµРј РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РёР· РєРµР№СЃР°
                 case 0: mirror_data = 1; break;
                 case 1: mirror_data = 2; break;
                 case 2: mirror_data = 5; break;
@@ -206,28 +206,28 @@ void input_discret (uint8_t *inbaud, uint8_t nomer)
                 case 6: mirror_data = 100; break;
                 case 7: mirror_data = 200; break;
            }
-           blink_many_simbol (0b0111000);	                                                 // мигаем 3мя символами
-           sprintf(send_buf, "   %03lu"  ,(uint32_t) mirror_data );                         // показываем текущее значение со смещением вправо и 3мя знаками. если там пусто показывать нули
-           if (button_press (KEY_ENTER)) {                                                      // при нажатии ентер применяем значение (нужно добавить еепром)
-                change_item = false; non_repit = false;                                         // выйти из режима изменения параметров, сбросить флаг единоразового выполнения при входе в функцию
-                if (nomer == 1){ param.discret1 = mirror_data;  EEPROM_write(EE_DISCKRET1,param.discret1); }            // присвоить измененное значение как новое
+           blink_many_simbol (0b0111000);	                                                 // РјРёРіР°РµРј 3РјСЏ СЃРёРјРІРѕР»Р°РјРё
+           sprintf(send_buf, "   %03lu"  ,(uint32_t) mirror_data );                         // РїРѕРєР°Р·С‹РІР°РµРј С‚РµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ СЃРѕ СЃРјРµС‰РµРЅРёРµРј РІРїСЂР°РІРѕ Рё 3РјСЏ Р·РЅР°РєР°РјРё. РµСЃР»Рё С‚Р°Рј РїСѓСЃС‚Рѕ РїРѕРєР°Р·С‹РІР°С‚СЊ РЅСѓР»Рё
+           if (button_press (KEY_ENTER)) {                                                      // РїСЂРё РЅР°Р¶Р°С‚РёРё РµРЅС‚РµСЂ РїСЂРёРјРµРЅСЏРµРј Р·РЅР°С‡РµРЅРёРµ (РЅСѓР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ РµРµРїСЂРѕРј)
+                change_item = false; non_repit = false;                                         // РІС‹Р№С‚Рё РёР· СЂРµР¶РёРјР° РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ, СЃР±СЂРѕСЃРёС‚СЊ С„Р»Р°Рі РµРґРёРЅРѕСЂР°Р·РѕРІРѕРіРѕ РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРё РІС…РѕРґРµ РІ С„СѓРЅРєС†РёСЋ
+                if (nomer == 1){ param.discret1 = mirror_data;  EEPROM_write(EE_DISCKRET1,param.discret1); }            // РїСЂРёСЃРІРѕРёС‚СЊ РёР·РјРµРЅРµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РєР°Рє РЅРѕРІРѕРµ
                 if (nomer == 2){ param.discret2 = mirror_data;  EEPROM_write(EE_DISCKRET2,param.discret2); }
                 if (nomer == 3){ param.discret3 = mirror_data;  EEPROM_write(EE_DISCKRET3,param.discret3); }
            }
       }    
 }
 
-void sill1_discrt (void)              // функция ввода порога   
+void sill1_discrt (void)              // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РїРѕСЂРѕРіР°   
 {
-	if (!change_item){                // пока мы не вводим данные   
-		if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}                                // отслеживаем ентер и если что переходим в выполнение ввода
-		sprintf(send_buf, "%06lu" , (uint32_t) param.sill1 );mirror_data = param.sill1;    // показываем значение параметра и если там пусто добавить нулями
+	if (!change_item){                // РїРѕРєР° РјС‹ РЅРµ РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ   
+		if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}                                // РѕС‚СЃР»РµР¶РёРІР°РµРј РµРЅС‚РµСЂ Рё РµСЃР»Рё С‡С‚Рѕ РїРµСЂРµС…РѕРґРёРј РІ РІС‹РїРѕР»РЅРµРЅРёРµ РІРІРѕРґР°
+		sprintf(send_buf, "%06lu" , (uint32_t) param.sill1 );mirror_data = param.sill1;    // РїРѕРєР°Р·С‹РІР°РµРј Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° Рё РµСЃР»Рё С‚Р°Рј РїСѓСЃС‚Рѕ РґРѕР±Р°РІРёС‚СЊ РЅСѓР»СЏРјРё
 	}
-	if (change_item){                                                                      // если мы вводим данные 
-		enter_numbers (5);                                                                 // передаем в функцию ввода данных нашу переменную и количество знаков для ввода
-		if (button_press (KEY_ENTER)) {                                                    // отслеживаем ентер (добавит еепром)
-			change_item = false; non_repit = false;                                        // выходим из функции изменения
-			param.sill1 = mirror_data;  EEPROM_write_32t(EE_SILL1,param.sill1); }          // приравниваем новоезначение в параметр
+	if (change_item){                                                                      // РµСЃР»Рё РјС‹ РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ 
+		enter_numbers (5);                                                                 // РїРµСЂРµРґР°РµРј РІ С„СѓРЅРєС†РёСЋ РІРІРѕРґР° РґР°РЅРЅС‹С… РЅР°С€Сѓ РїРµСЂРµРјРµРЅРЅСѓСЋ Рё РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РґР»СЏ РІРІРѕРґР°
+		if (button_press (KEY_ENTER)) {                                                    // РѕС‚СЃР»РµР¶РёРІР°РµРј РµРЅС‚РµСЂ (РґРѕР±Р°РІРёС‚ РµРµРїСЂРѕРј)
+			change_item = false; non_repit = false;                                        // РІС‹С…РѕРґРёРј РёР· С„СѓРЅРєС†РёРё РёР·РјРµРЅРµРЅРёСЏ
+			param.sill1 = mirror_data;  EEPROM_write_32t(EE_SILL1,param.sill1); }          // РїСЂРёСЂР°РІРЅРёРІР°РµРј РЅРѕРІРѕРµР·РЅР°С‡РµРЅРёРµ РІ РїР°СЂР°РјРµС‚СЂ
 	}
 }
 
@@ -245,7 +245,7 @@ void sill2_discrt (void)
 	}
 }
 
-void in_npv (void)                     // аналогичная функция для ввода НПВ
+void in_npv (void)                     // Р°РЅР°Р»РѕРіРёС‡РЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РІРІРѕРґР° РќРџР’
 {
 	if (!change_item){
 		if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}
@@ -263,30 +263,30 @@ void in_npv (void)                     // аналогичная функция для ввода НПВ
 	}
 }
 
-void sensor_numbers (void)             // функция для ввода количества датчиков
+void sensor_numbers (void)             // С„СѓРЅРєС†РёСЏ РґР»СЏ РІРІРѕРґР° РєРѕР»РёС‡РµСЃС‚РІР° РґР°С‚С‡РёРєРѕРІ
 {
-	if (!change_item){                 // пока не изменяем параметры
-		if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}         // отслеживаем ентер
-		sprintf(send_buf, "    %02lu" , (uint32_t) param.sensor_number );mirror_data_8bit = param.sensor_number;   // и выводим текущее значение на экран
+	if (!change_item){                 // РїРѕРєР° РЅРµ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹
+		if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}         // РѕС‚СЃР»РµР¶РёРІР°РµРј РµРЅС‚РµСЂ
+		sprintf(send_buf, "    %02lu" , (uint32_t) param.sensor_number );mirror_data_8bit = param.sensor_number;   // Рё РІС‹РІРѕРґРёРј С‚РµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ РЅР° СЌРєСЂР°РЅ
 	}
-	if (change_item){                                               // когда изменяем значение
-		if (button_press (KEY_UP)) { if (mirror_data_8bit < 12) mirror_data_8bit += 2;  }             // если кнопка вверх +2      
-		if (button_press (KEY_DOWN)) {if (mirror_data_8bit > 2) mirror_data_8bit -=2; }               // кнопка вниз -2   и это все для зеркала а не для функции чтоб если не нажму ентер не сохранилось
-		blink_many_simbol (0x30);                                                                     // мигаем двумя правыми символами
-		sprintf(send_buf, "    %02lu"  ,(uint32_t) mirror_data_8bit );                                // выводим зеркало чтоб показать что мы изменили
-		if (button_press (KEY_ENTER)) {                                                               // в случае нажатия на ентер сохраняем новое значение
+	if (change_item){                                               // РєРѕРіРґР° РёР·РјРµРЅСЏРµРј Р·РЅР°С‡РµРЅРёРµ
+		if (button_press (KEY_UP)) { if (mirror_data_8bit < 12) mirror_data_8bit += 2;  }             // РµСЃР»Рё РєРЅРѕРїРєР° РІРІРµСЂС… +2      
+		if (button_press (KEY_DOWN)) {if (mirror_data_8bit > 2) mirror_data_8bit -=2; }               // РєРЅРѕРїРєР° РІРЅРёР· -2   Рё СЌС‚Рѕ РІСЃРµ РґР»СЏ Р·РµСЂРєР°Р»Р° Р° РЅРµ РґР»СЏ С„СѓРЅРєС†РёРё С‡С‚РѕР± РµСЃР»Рё РЅРµ РЅР°Р¶РјСѓ РµРЅС‚РµСЂ РЅРµ СЃРѕС…СЂР°РЅРёР»РѕСЃСЊ
+		blink_many_simbol (0x30);                                                                     // РјРёРіР°РµРј РґРІСѓРјСЏ РїСЂР°РІС‹РјРё СЃРёРјРІРѕР»Р°РјРё
+		sprintf(send_buf, "    %02lu"  ,(uint32_t) mirror_data_8bit );                                // РІС‹РІРѕРґРёРј Р·РµСЂРєР°Р»Рѕ С‡С‚РѕР± РїРѕРєР°Р·Р°С‚СЊ С‡С‚Рѕ РјС‹ РёР·РјРµРЅРёР»Рё
+		if (button_press (KEY_ENTER)) {                                                               // РІ СЃР»СѓС‡Р°Рµ РЅР°Р¶Р°С‚РёСЏ РЅР° РµРЅС‚РµСЂ СЃРѕС…СЂР°РЅСЏРµРј РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
         param.sensor_number = mirror_data_8bit; EEPROM_write(EE_SENNUMBER,param.sensor_number);
         change_item = false; non_repit = false;
         }   
 	}
 }
 
-void tips_cd (void)                    // аналогичная функция для ввода типа датчика
+void tips_cd (void)                    // Р°РЅР°Р»РѕРіРёС‡РЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РІРІРѕРґР° С‚РёРїР° РґР°С‚С‡РёРєР°
 {
      enter_8bit (1,2,&param.tip_cd,EE_TIPCD,1); 
 }
 
-void baud_rate1 (void)                 // короче для одинаковых функций ввода решил сделать обобщающую функцию, это экономит память
+void baud_rate1 (void)                 // РєРѕСЂРѕС‡Рµ РґР»СЏ РѕРґРёРЅР°РєРѕРІС‹С… С„СѓРЅРєС†РёР№ РІРІРѕРґР° СЂРµС€РёР» СЃРґРµР»Р°С‚СЊ РѕР±РѕР±С‰Р°СЋС‰СѓСЋ С„СѓРЅРєС†РёСЋ, СЌС‚Рѕ СЌРєРѕРЅРѕРјРёС‚ РїР°РјСЏС‚СЊ
 {
   input_baud (&param.baud1,1);
 }
@@ -296,52 +296,52 @@ void baud_rate2 (void)
      input_baud (&param.baud2,2);
 }
 
-void input_baud (uint8_t *inbaud, uint8_t nomer)       // сюда передаем ссылку на переменную
+void input_baud (uint8_t *inbaud, uint8_t nomer)       // СЃСЋРґР° РїРµСЂРµРґР°РµРј СЃСЃС‹Р»РєСѓ РЅР° РїРµСЂРµРјРµРЅРЅСѓСЋ
 {
-     if (!change_item){                    // это флаг того что мы изменяем параметры или нет
-          if (button_press (KEY_ENTER)) {change_item = true;}         // пока не изменяем параметры отслеживаем кнопку ентер, как только нажали поднимаем флаг что мы изменяем параметры
-          switch (*inbaud){                                           // тупая функция но все же. сюда передаем значение хранящиеся в памяти и в зависимости от этого присваиваем промежуточной переменной
-               // значение из кейсов для того чтоб при входе в изменение показывали текущий пункт перед изменением а не нулевой!
+     if (!change_item){                    // СЌС‚Рѕ С„Р»Р°Рі С‚РѕРіРѕ С‡С‚Рѕ РјС‹ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РёР»Рё РЅРµС‚
+          if (button_press (KEY_ENTER)) {change_item = true;}         // РїРѕРєР° РЅРµ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РѕС‚СЃР»РµР¶РёРІР°РµРј РєРЅРѕРїРєСѓ РµРЅС‚РµСЂ, РєР°Рє С‚РѕР»СЊРєРѕ РЅР°Р¶Р°Р»Рё РїРѕРґРЅРёРјР°РµРј С„Р»Р°Рі С‡С‚Рѕ РјС‹ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹
+          switch (*inbaud){                                           // С‚СѓРїР°СЏ С„СѓРЅРєС†РёСЏ РЅРѕ РІСЃРµ Р¶Рµ. СЃСЋРґР° РїРµСЂРµРґР°РµРј Р·РЅР°С‡РµРЅРёРµ С…СЂР°РЅСЏС‰РёРµСЃСЏ РІ РїР°РјСЏС‚Рё Рё РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЌС‚РѕРіРѕ РїСЂРёСЃРІР°РёРІР°РµРј РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
+               // Р·РЅР°С‡РµРЅРёРµ РёР· РєРµР№СЃРѕРІ РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР± РїСЂРё РІС…РѕРґРµ РІ РёР·РјРµРЅРµРЅРёРµ РїРѕРєР°Р·С‹РІР°Р»Рё С‚РµРєСѓС‰РёР№ РїСѓРЅРєС‚ РїРµСЂРµРґ РёР·РјРµРЅРµРЅРёРµРј Р° РЅРµ РЅСѓР»РµРІРѕР№!
                case 0:    mirror_data_8bit = 0;sprintf (send_buf, "   600"    ); break;             
-               case 1:    mirror_data_8bit = 1;sprintf (send_buf, "  2400"   ); break;          //плюс выводим по разному для красивого отображения
+               case 1:    mirror_data_8bit = 1;sprintf (send_buf, "  2400"   ); break;          //РїР»СЋСЃ РІС‹РІРѕРґРёРј РїРѕ СЂР°Р·РЅРѕРјСѓ РґР»СЏ РєСЂР°СЃРёРІРѕРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
                case 2:    mirror_data_8bit = 2;sprintf (send_buf, "  9600"   ); break;
                case 3:    mirror_data_8bit = 3;sprintf (send_buf, " 19200"  ); break;
           }
      }
-     if (change_item){                                                // теперь если мы изменяем параметры
-          if (button_press (KEY_UP)) { if (mirror_data_8bit < 3) mirror_data_8bit ++;  }   // отслеживаем кнопку вверх и пока промежуточное значение меньше 8 плюсуем его
-          if (button_press (KEY_DOWN)) {if (mirror_data_8bit > 0) mirror_data_8bit --; }   // ну или же минусуем
-          switch (mirror_data_8bit){                                                       // в зависимости от того до куда доклацали нашу переменную присваиваем новое значение из кейса
+     if (change_item){                                                // С‚РµРїРµСЂСЊ РµСЃР»Рё РјС‹ РёР·РјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹
+          if (button_press (KEY_UP)) { if (mirror_data_8bit < 3) mirror_data_8bit ++;  }   // РѕС‚СЃР»РµР¶РёРІР°РµРј РєРЅРѕРїРєСѓ РІРІРµСЂС… Рё РїРѕРєР° РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РјРµРЅСЊС€Рµ 8 РїР»СЋСЃСѓРµРј РµРіРѕ
+          if (button_press (KEY_DOWN)) {if (mirror_data_8bit > 0) mirror_data_8bit --; }   // РЅСѓ РёР»Рё Р¶Рµ РјРёРЅСѓСЃСѓРµРј
+          switch (mirror_data_8bit){                                                       // РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ РґРѕ РєСѓРґР° РґРѕРєР»Р°С†Р°Р»Рё РЅР°С€Сѓ РїРµСЂРµРјРµРЅРЅСѓСЋ РїСЂРёСЃРІР°РёРІР°РµРј РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РёР· РєРµР№СЃР°
                case 0: mirror_data = 0;   blink_many_simbol (0b0111111); sprintf(send_buf, "   600"    );  break;         
                case 1: mirror_data = 1;   blink_many_simbol (0b0111111); sprintf(send_buf, "  2400"   );  break;
                case 2: mirror_data = 2;   blink_many_simbol (0b0111111); sprintf(send_buf, "  9600"   );  break;
                case 3: mirror_data = 3;   blink_many_simbol (0b0111111); sprintf(send_buf, " 19200"  );  break;
           }
-          if (button_press (KEY_ENTER)) {                                                       // при нажатии ентер применяем значение (нужно добавить еепром)
-               change_item = false; non_repit = false;                                          // выйти из режима изменения параметров, сбросить флаг единоразового выполнения при входе в функцию
-               if (nomer == 1){ param.baud1 = mirror_data_8bit;  EEPROM_write(EE_BAUD1,param.baud1); }            // присвоить измененное значение как новое
+          if (button_press (KEY_ENTER)) {                                                       // РїСЂРё РЅР°Р¶Р°С‚РёРё РµРЅС‚РµСЂ РїСЂРёРјРµРЅСЏРµРј Р·РЅР°С‡РµРЅРёРµ (РЅСѓР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ РµРµРїСЂРѕРј)
+               change_item = false; non_repit = false;                                          // РІС‹Р№С‚Рё РёР· СЂРµР¶РёРјР° РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ, СЃР±СЂРѕСЃРёС‚СЊ С„Р»Р°Рі РµРґРёРЅРѕСЂР°Р·РѕРІРѕРіРѕ РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРё РІС…РѕРґРµ РІ С„СѓРЅРєС†РёСЋ
+               if (nomer == 1){ param.baud1 = mirror_data_8bit;  EEPROM_write(EE_BAUD1,param.baud1); }            // РїСЂРёСЃРІРѕРёС‚СЊ РёР·РјРµРЅРµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РєР°Рє РЅРѕРІРѕРµ
                if (nomer == 2){ param.baud2 = mirror_data_8bit;  EEPROM_write(EE_BAUD2,param.baud2); } 
                init_UART_0_1 (param.baud1, param.baud2);    
           }
      }
 }
 
-void protocol_data1 (void)              // простая функция как ввод количества цд
+void protocol_data1 (void)              // РїСЂРѕСЃС‚Р°СЏ С„СѓРЅРєС†РёСЏ РєР°Рє РІРІРѕРґ РєРѕР»РёС‡РµСЃС‚РІР° С†Рґ
 {
      enter_8bit (1,2,&param.protokol1,EE_PROTOCOL1,1); 
 }
 
-void protocol_data2 (void)              // аналогично первой
+void protocol_data2 (void)              // Р°РЅР°Р»РѕРіРёС‡РЅРѕ РїРµСЂРІРѕР№
 {
     enter_8bit (1,2,&param.protokol2,EE_PROTOCOL2,1);  
 }
 
-void filtr_data (void)                  // и это тоже. в дальнейшем нужно написать функцию которая объеденит их 
+void filtr_data (void)                  // Рё СЌС‚Рѕ С‚РѕР¶Рµ. РІ РґР°Р»СЊРЅРµР№С€РµРј РЅСѓР¶РЅРѕ РЅР°РїРёСЃР°С‚СЊ С„СѓРЅРєС†РёСЋ РєРѕС‚РѕСЂР°СЏ РѕР±СЉРµРґРµРЅРёС‚ РёС… 
 {
     enter_8bit (1,5,&param.filtr,EE_FILTR,1);  
 }
 
-void light (void)                       // настройка яркости
+void light (void)                       // РЅР°СЃС‚СЂРѕР№РєР° СЏСЂРєРѕСЃС‚Рё
 {
 	if (!change_item){
 		if (button_press (KEY_ENTER)) {change_item = true;}
@@ -355,7 +355,7 @@ void light (void)                       // настройка яркости
 		if (button_press (KEY_ENTER)) {param.lighte = mirror_data_8bit;
 			change_item = false; non_repit = false;
 			switch (param.lighte){
-				case 0:if (!spi_stop) send_data ( 0x0A,  0x04); break;                // сразу отправляем в микру новое значение яркости
+				case 0:if (!spi_stop) send_data ( 0x0A,  0x04); break;                // СЃСЂР°Р·Сѓ РѕС‚РїСЂР°РІР»СЏРµРј РІ РјРёРєСЂСѓ РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ СЏСЂРєРѕСЃС‚Рё
 				case 1:if (!spi_stop) send_data ( 0x0A,  0x07); break;
 				case 2:if (!spi_stop) send_data ( 0x0A,  0x0F); break;
 			}
@@ -363,53 +363,53 @@ void light (void)                       // настройка яркости
 	}
 }
 
-void enter_time (void)                  // функция ввода времени    
+void enter_time (void)                  // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РІСЂРµРјРµРЅРё    
 {
     enter_1307(&DS.hour, &DS.min, &DS.sec, 0);
 }
 
-void enter_date (void)                  // функция ввода даты
+void enter_date (void)                  // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РґР°С‚С‹
 {
    enter_1307(&DS.date, &DS.month, &DS.year, 1);    
 }
 
-void enter_1307 (unsigned int *number1, unsigned int *number2, unsigned int *number3, uint8_t option)    // обобщеная функция ввода времни и даты
+void enter_1307 (unsigned int *number1, unsigned int *number2, unsigned int *number3, uint8_t option)    // РѕР±РѕР±С‰РµРЅР°СЏ С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РІСЂРµРјРЅРё Рё РґР°С‚С‹
 {
     if (tim_5 == 0) { tim_5 = 15000;  DS_Read(); } 
 	if (!change_item){
-     	if (admin_parol|| super_parol || option != 1) if (button_press (KEY_ENTER)) {change_item = true; mirror_data_8bit = 0;}      // это защита от входа в изменение даты без пароля
-     	sprintf(send_buf, "%02d.%02d.%02d." ,  *number1,*number2,*number3);                                                          // тут показываем или время или дату. передаем сюда указатель на данные
+     	if (admin_parol|| super_parol || option != 1) if (button_press (KEY_ENTER)) {change_item = true; mirror_data_8bit = 0;}      // СЌС‚Рѕ Р·Р°С‰РёС‚Р° РѕС‚ РІС…РѕРґР° РІ РёР·РјРµРЅРµРЅРёРµ РґР°С‚С‹ Р±РµР· РїР°СЂРѕР»СЏ
+     	sprintf(send_buf, "%02d.%02d.%02d." ,  *number1,*number2,*number3);                                                          // С‚СѓС‚ РїРѕРєР°Р·С‹РІР°РµРј РёР»Рё РІСЂРµРјСЏ РёР»Рё РґР°С‚Сѓ. РїРµСЂРµРґР°РµРј СЃСЋРґР° СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РґР°РЅРЅС‹Рµ
 	}
 	if (change_item){
-     	tim_3 = 1000;                                                                                 // сбрасываем таймер чтоб в это время не опрашивались часы
-     	static char itedger [10] ;                                                                    // буффер для хранения разбитых данных  // по хорошему нужно сделать один большой буффер для всех
-     	if (!non_repit){ non_repit = true;  sprintf(itedger, "%02d%02d%02d" ,  *number1,*number2,*number3 ); mirror_data_8bit = 0 ; }     // при первом входе забиваем буффер текущими данными
+     	tim_3 = 1000;                                                                                 // СЃР±СЂР°СЃС‹РІР°РµРј С‚Р°Р№РјРµСЂ С‡С‚РѕР± РІ СЌС‚Рѕ РІСЂРµРјСЏ РЅРµ РѕРїСЂР°С€РёРІР°Р»РёСЃСЊ С‡Р°СЃС‹
+     	static char itedger [10] ;                                                                    // Р±СѓС„С„РµСЂ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЂР°Р·Р±РёС‚С‹С… РґР°РЅРЅС‹С…  // РїРѕ С…РѕСЂРѕС€РµРјСѓ РЅСѓР¶РЅРѕ СЃРґРµР»Р°С‚СЊ РѕРґРёРЅ Р±РѕР»СЊС€РѕР№ Р±СѓС„С„РµСЂ РґР»СЏ РІСЃРµС…
+     	if (!non_repit){ non_repit = true;  sprintf(itedger, "%02d%02d%02d" ,  *number1,*number2,*number3 ); mirror_data_8bit = 0 ; }     // РїСЂРё РїРµСЂРІРѕРј РІС…РѕРґРµ Р·Р°Р±РёРІР°РµРј Р±СѓС„С„РµСЂ С‚РµРєСѓС‰РёРјРё РґР°РЅРЅС‹РјРё
      	else {
-          	if (button_press (KEY_RIGHT)) { if (mirror_data_8bit < 5  ) mirror_data_8bit ++; }           // кнопка в право увеличивает переменную которая отвечает за номер вводимого символа
-          	if (button_press (KEY_LEFT)) {if (mirror_data_8bit > 0) mirror_data_8bit --;}                // кнопка в лево уменьшает
-          	if (button_press (KEY_UP)) {                                                                 // кнопка вверх 
-               	if (itedger[mirror_data_8bit] - '0' < 9) itedger[mirror_data_8bit]  ++;                  // проверяет какой символ в элементе буффера. если это цифра, и она меньше 9 то можно ее увеличить
-               	else if(itedger[mirror_data_8bit] - '0' == 9) itedger[mirror_data_8bit] = '0';           // если же это 9ка, то сбросить в ноль. типа зациклить. минус символ нуля это для перевода из аски
-          	}          // щас подумал, по хорошему переделать, и все указать в аски, таким образом даже если там будет мусор то мы его обнаружим
-          	if (button_press (KEY_DOWN)) {                                                               // кнопка вверх делает тоже самое но в другом направлении
+          	if (button_press (KEY_RIGHT)) { if (mirror_data_8bit < 5  ) mirror_data_8bit ++; }           // РєРЅРѕРїРєР° РІ РїСЂР°РІРѕ СѓРІРµР»РёС‡РёРІР°РµС‚ РїРµСЂРµРјРµРЅРЅСѓСЋ РєРѕС‚РѕСЂР°СЏ РѕС‚РІРµС‡Р°РµС‚ Р·Р° РЅРѕРјРµСЂ РІРІРѕРґРёРјРѕРіРѕ СЃРёРјРІРѕР»Р°
+          	if (button_press (KEY_LEFT)) {if (mirror_data_8bit > 0) mirror_data_8bit --;}                // РєРЅРѕРїРєР° РІ Р»РµРІРѕ СѓРјРµРЅСЊС€Р°РµС‚
+          	if (button_press (KEY_UP)) {                                                                 // РєРЅРѕРїРєР° РІРІРµСЂС… 
+               	if (itedger[mirror_data_8bit] - '0' < 9) itedger[mirror_data_8bit]  ++;                  // РїСЂРѕРІРµСЂСЏРµС‚ РєР°РєРѕР№ СЃРёРјРІРѕР» РІ СЌР»РµРјРµРЅС‚Рµ Р±СѓС„С„РµСЂР°. РµСЃР»Рё СЌС‚Рѕ С†РёС„СЂР°, Рё РѕРЅР° РјРµРЅСЊС€Рµ 9 С‚Рѕ РјРѕР¶РЅРѕ РµРµ СѓРІРµР»РёС‡РёС‚СЊ
+               	else if(itedger[mirror_data_8bit] - '0' == 9) itedger[mirror_data_8bit] = '0';           // РµСЃР»Рё Р¶Рµ СЌС‚Рѕ 9РєР°, С‚Рѕ СЃР±СЂРѕСЃРёС‚СЊ РІ РЅРѕР»СЊ. С‚РёРїР° Р·Р°С†РёРєР»РёС‚СЊ. РјРёРЅСѓСЃ СЃРёРјРІРѕР» РЅСѓР»СЏ СЌС‚Рѕ РґР»СЏ РїРµСЂРµРІРѕРґР° РёР· Р°СЃРєРё
+          	}          // С‰Р°СЃ РїРѕРґСѓРјР°Р», РїРѕ С…РѕСЂРѕС€РµРјСѓ РїРµСЂРµРґРµР»Р°С‚СЊ, Рё РІСЃРµ СѓРєР°Р·Р°С‚СЊ РІ Р°СЃРєРё, С‚Р°РєРёРј РѕР±СЂР°Р·РѕРј РґР°Р¶Рµ РµСЃР»Рё С‚Р°Рј Р±СѓРґРµС‚ РјСѓСЃРѕСЂ С‚Рѕ РјС‹ РµРіРѕ РѕР±РЅР°СЂСѓР¶РёРј
+          	if (button_press (KEY_DOWN)) {                                                               // РєРЅРѕРїРєР° РІРІРµСЂС… РґРµР»Р°РµС‚ С‚РѕР¶Рµ СЃР°РјРѕРµ РЅРѕ РІ РґСЂСѓРіРѕРј РЅР°РїСЂР°РІР»РµРЅРёРё
                	if (itedger[mirror_data_8bit] - '0'  > 0) itedger[mirror_data_8bit]  --;
                	else if(itedger[mirror_data_8bit] - '0'  == 0) itedger[mirror_data_8bit]  = '9';
           	}
-          	sscanf(itedger,"%02u%02u%02u" ,  number1, number2, number3 );                                 // тут мы складываем обратно в переменные наш буфер
-          	blink_simbol (mirror_data_8bit);                                                              // моргаем тем символом, на который указывает переменная вводимого символа
-          	sprintf(send_buf, "%02d.%02d.%02d." ,  *number1,*number2,*number3);                           // тут отображаем на экране уже собранные из буффера переменные
-          	if (button_press (KEY_ENTER)) {                                                               // по нажатию клавиши ентер
-               	change_item = false; non_repit = false;                                                   // выходим из изменения параметров, и сбрасываем флаг единичного выполнения
-                if (option == 0)   {                                                                      // если передавали 0 то значит это была дата
-               	  if ( DS.hour < 25 && DS.min < 60 && DS.sec < 60) {DS_Write_time ();}                    // если мы находимся в диапазоне правильных значений, записать их в микру часов
-                  else { error_func(ERROR5);}                                                             // если значения не правильные еррор
+          	sscanf(itedger,"%02u%02u%02u" ,  number1, number2, number3 );                                 // С‚СѓС‚ РјС‹ СЃРєР»Р°РґС‹РІР°РµРј РѕР±СЂР°С‚РЅРѕ РІ РїРµСЂРµРјРµРЅРЅС‹Рµ РЅР°С€ Р±СѓС„РµСЂ
+          	blink_simbol (mirror_data_8bit);                                                              // РјРѕСЂРіР°РµРј С‚РµРј СЃРёРјРІРѕР»РѕРј, РЅР° РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·С‹РІР°РµС‚ РїРµСЂРµРјРµРЅРЅР°СЏ РІРІРѕРґРёРјРѕРіРѕ СЃРёРјРІРѕР»Р°
+          	sprintf(send_buf, "%02d.%02d.%02d." ,  *number1,*number2,*number3);                           // С‚СѓС‚ РѕС‚РѕР±СЂР°Р¶Р°РµРј РЅР° СЌРєСЂР°РЅРµ СѓР¶Рµ СЃРѕР±СЂР°РЅРЅС‹Рµ РёР· Р±СѓС„С„РµСЂР° РїРµСЂРµРјРµРЅРЅС‹Рµ
+          	if (button_press (KEY_ENTER)) {                                                               // РїРѕ РЅР°Р¶Р°С‚РёСЋ РєР»Р°РІРёС€Рё РµРЅС‚РµСЂ
+               	change_item = false; non_repit = false;                                                   // РІС‹С…РѕРґРёРј РёР· РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ, Рё СЃР±СЂР°СЃС‹РІР°РµРј С„Р»Р°Рі РµРґРёРЅРёС‡РЅРѕРіРѕ РІС‹РїРѕР»РЅРµРЅРёСЏ
+                if (option == 0)   {                                                                      // РµСЃР»Рё РїРµСЂРµРґР°РІР°Р»Рё 0 С‚Рѕ Р·РЅР°С‡РёС‚ СЌС‚Рѕ Р±С‹Р»Р° РґР°С‚Р°
+               	  if ( DS.hour < 25 && DS.min < 60 && DS.sec < 60) {DS_Write_time ();}                    // РµСЃР»Рё РјС‹ РЅР°С…РѕРґРёРјСЃСЏ РІ РґРёР°РїР°Р·РѕРЅРµ РїСЂР°РІРёР»СЊРЅС‹С… Р·РЅР°С‡РµРЅРёР№, Р·Р°РїРёСЃР°С‚СЊ РёС… РІ РјРёРєСЂСѓ С‡Р°СЃРѕРІ
+                  else { error_func(ERROR5);}                                                             // РµСЃР»Рё Р·РЅР°С‡РµРЅРёСЏ РЅРµ РїСЂР°РІРёР»СЊРЅС‹Рµ РµСЂСЂРѕСЂ
                 }  
-                if (option == 1)   {                                                                      // аналогично для даты
+                if (option == 1)   {                                                                      // Р°РЅР°Р»РѕРіРёС‡РЅРѕ РґР»СЏ РґР°С‚С‹
                   if ( DS.date < 31 && DS.month < 13 && DS.year < 99) {DS_Write_date ();}
                   else { error_func(ERROR5);}                
                 } 
-                if (option == 2)   {                                                                      // аналогично для даты err36
-                     if ( *number1 < 31 && *number2 < 13 && *number3 < 99) {write_no_pay ();massa = 2;}   // масса переиспользуется 
+                if (option == 2)   {                                                                      // Р°РЅР°Р»РѕРіРёС‡РЅРѕ РґР»СЏ РґР°С‚С‹ err36
+                     if ( *number1 < 31 && *number2 < 13 && *number3 < 99) {write_no_pay ();massa = 2;}   // РјР°СЃСЃР° РїРµСЂРµРёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ 
                      else { error_func(ERROR5);}
                 }                                                       
           	}
@@ -417,83 +417,83 @@ void enter_1307 (unsigned int *number1, unsigned int *number2, unsigned int *num
 	}       
 }
 
-void kal_koef (void)                    // ввод калибровочного коэф
+void kal_koef (void)                    // РІРІРѕРґ РєР°Р»РёР±СЂРѕРІРѕС‡РЅРѕРіРѕ РєРѕСЌС„
 {
 	if (!change_item){
-		if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}                                // защита от ввода без пароля, или разблокировки
-		sprintf(send_buf, "%f" ,  param.calib_koef ); mirror_double = param.calib_koef;                      // выводим на экран калиб, коэф
+		if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}                                // Р·Р°С‰РёС‚Р° РѕС‚ РІРІРѕРґР° Р±РµР· РїР°СЂРѕР»СЏ, РёР»Рё СЂР°Р·Р±Р»РѕРєРёСЂРѕРІРєРё
+		sprintf(send_buf, "%f" ,  param.calib_koef ); mirror_double = param.calib_koef;                      // РІС‹РІРѕРґРёРј РЅР° СЌРєСЂР°РЅ РєР°Р»РёР±, РєРѕСЌС„
 	}
 	if (change_item){
-		enter_float ();                                                                                      // переходим в функцию ввода флоат числа
+		enter_float ();                                                                                      // РїРµСЂРµС…РѕРґРёРј РІ С„СѓРЅРєС†РёСЋ РІРІРѕРґР° С„Р»РѕР°С‚ С‡РёСЃР»Р°
 		if (button_press (KEY_ENTER)) {
-			change_item = false; non_repit = false;                                                          // выходим из функции ввода, сбрасываем одноразовое выполнение
-			if (mirror_double < 0.001 || mirror_double > 500) {                                                // если ввели некоректные значения еррор
+			change_item = false; non_repit = false;                                                          // РІС‹С…РѕРґРёРј РёР· С„СѓРЅРєС†РёРё РІРІРѕРґР°, СЃР±СЂР°СЃС‹РІР°РµРј РѕРґРЅРѕСЂР°Р·РѕРІРѕРµ РІС‹РїРѕР»РЅРµРЅРёРµ
+			if (mirror_double < 0.001 || mirror_double > 500) {                                                // РµСЃР»Рё РІРІРµР»Рё РЅРµРєРѕСЂРµРєС‚РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РµСЂСЂРѕСЂ
 				error_func (ERROR5);
 			}
-			else{ param.calib_koef = mirror_double;                                                           // если корректные то сохраняем
+			else{ param.calib_koef = mirror_double;                                                           // РµСЃР»Рё РєРѕСЂСЂРµРєС‚РЅС‹Рµ С‚Рѕ СЃРѕС…СЂР°РЅСЏРµРј
             EEPROM_write_float(EE_KALIBKOEF,param.calib_koef);}
 		}
 	}
 }
 
-void init_menu (void)                   // функция инициализации меню. просто указателю присваиваем нулевой пункт меню.
+void init_menu (void)                   // С„СѓРЅРєС†РёСЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РјРµРЅСЋ. РїСЂРѕСЃС‚Рѕ СѓРєР°Р·Р°С‚РµР»СЋ РїСЂРёСЃРІР°РёРІР°РµРј РЅСѓР»РµРІРѕР№ РїСѓРЅРєС‚ РјРµРЅСЋ.
 {
-	pointer_menu = ((MenuItem*)&MenuItems[0]);      // так получаю правильный адрес
-     #ifdef DEBUG_MOD                               // чтоб в отладке не вводить постоянно пароли конченые
+	pointer_menu = ((MenuItem*)&MenuItems[0]);      // С‚Р°Рє РїРѕР»СѓС‡Р°СЋ РїСЂР°РІРёР»СЊРЅС‹Р№ Р°РґСЂРµСЃ
+     #ifdef DEBUG_MOD                               // С‡С‚РѕР± РІ РѕС‚Р»Р°РґРєРµ РЅРµ РІРІРѕРґРёС‚СЊ РїРѕСЃС‚РѕСЏРЅРЅРѕ РїР°СЂРѕР»Рё РєРѕРЅС‡РµРЅС‹Рµ
      super_parol = true;
      #endif
 }
 
-void error_func (uint8_t error_number)  // фунция для отображения 
+void error_func (uint8_t error_number)  // С„СѓРЅС†РёСЏ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ 
 {
-	tim_0 = 0;                          // сбрасываем таймер моргания
-	tim_1 = 60000;                      // взводим таймер отображения ерора
-	while (!tim_1 == 0)                 // и падаем в вайл, а в нем вызываем показ различных строк из флеша
-	{strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[error_number])));}     // если компилятор не знает какие именно данные я буду использовать то он не сможет подставить значение. и по этому нужно передавать вот такую дичь
+	tim_0 = 0;                          // СЃР±СЂР°СЃС‹РІР°РµРј С‚Р°Р№РјРµСЂ РјРѕСЂРіР°РЅРёСЏ
+	tim_1 = 60000;                      // РІР·РІРѕРґРёРј С‚Р°Р№РјРµСЂ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РµСЂРѕСЂР°
+	while (!tim_1 == 0)                 // Рё РїР°РґР°РµРј РІ РІР°Р№Р», Р° РІ РЅРµРј РІС‹Р·С‹РІР°РµРј РїРѕРєР°Р· СЂР°Р·Р»РёС‡РЅС‹С… СЃС‚СЂРѕРє РёР· С„Р»РµС€Р°
+	{strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[error_number])));}     // РµСЃР»Рё РєРѕРјРїРёР»СЏС‚РѕСЂ РЅРµ Р·РЅР°РµС‚ РєР°РєРёРµ РёРјРµРЅРЅРѕ РґР°РЅРЅС‹Рµ СЏ Р±СѓРґСѓ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚Рѕ РѕРЅ РЅРµ СЃРјРѕР¶РµС‚ РїРѕРґСЃС‚Р°РІРёС‚СЊ Р·РЅР°С‡РµРЅРёРµ. Рё РїРѕ СЌС‚РѕРјСѓ РЅСѓР¶РЅРѕ РїРµСЂРµРґР°РІР°С‚СЊ РІРѕС‚ С‚Р°РєСѓСЋ РґРёС‡СЊ
 }
 
-void Pasword_press (void)               // функция ввода пароля
+void Pasword_press (void)               // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РїР°СЂРѕР»СЏ
 {
     static int32_t xor_pas;
 	if (!change_item){
-     	if (button_press (KEY_ENTER)) {change_item = true; xor_pas = 0; xor_pas = (DS.date * 100); xor_pas += DS.month; }   // так мы формируем число для ХОР 
-     	sprintf(send_buf, "  0000" ); mirror_data = 0;       // показываем нули справа
+     	if (button_press (KEY_ENTER)) {change_item = true; xor_pas = 0; xor_pas = (DS.date * 100); xor_pas += DS.month; }   // С‚Р°Рє РјС‹ С„РѕСЂРјРёСЂСѓРµРј С‡РёСЃР»Рѕ РґР»СЏ РҐРћР  
+     	sprintf(send_buf, "  0000" ); mirror_data = 0;       // РїРѕРєР°Р·С‹РІР°РµРј РЅСѓР»Рё СЃРїСЂР°РІР°
 	}
 	if (change_item){
-     	enter_numbers (3);                                   // заходим в функцию ввода числа
-     	if (button_press (KEY_ENTER)) {                      // по ентеру
-              change_item = false; non_repit = false;        // сбрасываем выполнение функции, и флаг единоразового входа
-              if (mirror_data == PASWORD_ADMIN) { admin_parol = true; error_func (NOERROR); go_func = false;}   // если ввели число равное паролю админа, поднять флаг пароля, показать что ок, и сразу выйти из функции ввода
+     	enter_numbers (3);                                   // Р·Р°С…РѕРґРёРј РІ С„СѓРЅРєС†РёСЋ РІРІРѕРґР° С‡РёСЃР»Р°
+     	if (button_press (KEY_ENTER)) {                      // РїРѕ РµРЅС‚РµСЂСѓ
+              change_item = false; non_repit = false;        // СЃР±СЂР°СЃС‹РІР°РµРј РІС‹РїРѕР»РЅРµРЅРёРµ С„СѓРЅРєС†РёРё, Рё С„Р»Р°Рі РµРґРёРЅРѕСЂР°Р·РѕРІРѕРіРѕ РІС…РѕРґР°
+              if (mirror_data == PASWORD_ADMIN) { admin_parol = true; error_func (NOERROR); go_func = false;}   // РµСЃР»Рё РІРІРµР»Рё С‡РёСЃР»Рѕ СЂР°РІРЅРѕРµ РїР°СЂРѕР»СЋ Р°РґРјРёРЅР°, РїРѕРґРЅСЏС‚СЊ С„Р»Р°Рі РїР°СЂРѕР»СЏ, РїРѕРєР°Р·Р°С‚СЊ С‡С‚Рѕ РѕРє, Рё СЃСЂР°Р·Сѓ РІС‹Р№С‚Рё РёР· С„СѓРЅРєС†РёРё РІРІРѕРґР°
               if (mirror_data == PASWORD_SUPER) { super_parol = true; error_func (NOERROR); go_func = false;}
-              if (mirror_data == (xor_pas ^ 0xFFF)) { super_parol = true; error_func (NOERROR); go_func = false;}         // это ввод пароля в зависимости от даты  0xFFF
-              if (mirror_data != PASWORD_SUPER && mirror_data != PASWORD_ADMIN) {error_func (ERROR5); }         // если пароль не соответствует то еррор
+              if (mirror_data == (xor_pas ^ 0xFFF)) { super_parol = true; error_func (NOERROR); go_func = false;}         // СЌС‚Рѕ РІРІРѕРґ РїР°СЂРѕР»СЏ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РґР°С‚С‹  0xFFF
+              if (mirror_data != PASWORD_SUPER && mirror_data != PASWORD_ADMIN) {error_func (ERROR5); }         // РµСЃР»Рё РїР°СЂРѕР»СЊ РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С‚Рѕ РµСЂСЂРѕСЂ
         }
 	}	
 }
 
-void void_func (void)                   // пустая функция-затычка для структуры меню
+void void_func (void)                   // РїСѓСЃС‚Р°СЏ С„СѓРЅРєС†РёСЏ-Р·Р°С‚С‹С‡РєР° РґР»СЏ СЃС‚СЂСѓРєС‚СѓСЂС‹ РјРµРЅСЋ
 {
 	
 }
 
-void enter_numbers (uint8_t size )               // можно передавать значение от 0 до 5. это количество значимых цифр
+void enter_numbers (uint8_t size )               // РјРѕР¶РЅРѕ РїРµСЂРµРґР°РІР°С‚СЊ Р·РЅР°С‡РµРЅРёРµ РѕС‚ 0 РґРѕ 5. СЌС‚Рѕ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°С‡РёРјС‹С… С†РёС„СЂ
 {
-	static uint8_t  caunter_input;               // создаем счетчик
-	static char itedger [10] ;                   // создаем буффер
-	if (!non_repit){ non_repit = true; mirror_data = labs(mirror_data);  sprintf(itedger, "%06ld"  ,(int32_t) mirror_data ); caunter_input = 5 - size; }    // первое выполнение, разбиваем входящее число на элементы в буффер, а так же делаем смещение на 
-	else {                                                                                                                  // то количество сколько символов передали
-		if (button_press (KEY_RIGHT)) { if (caunter_input < 5  ) caunter_input ++; }                                        // кнопка в право, сместить указатель
-		if (button_press (KEY_LEFT)) {if (caunter_input >( 5 - size)) caunter_input --;}                                    // аналогично сместить в другую сторону если можна
+	static uint8_t  caunter_input;               // СЃРѕР·РґР°РµРј СЃС‡РµС‚С‡РёРє
+	static char itedger [10] ;                   // СЃРѕР·РґР°РµРј Р±СѓС„С„РµСЂ
+	if (!non_repit){ non_repit = true; mirror_data = labs(mirror_data);  sprintf(itedger, "%06ld"  ,(int32_t) mirror_data ); caunter_input = 5 - size; }    // РїРµСЂРІРѕРµ РІС‹РїРѕР»РЅРµРЅРёРµ, СЂР°Р·Р±РёРІР°РµРј РІС…РѕРґСЏС‰РµРµ С‡РёСЃР»Рѕ РЅР° СЌР»РµРјРµРЅС‚С‹ РІ Р±СѓС„С„РµСЂ, Р° С‚Р°Рє Р¶Рµ РґРµР»Р°РµРј СЃРјРµС‰РµРЅРёРµ РЅР° 
+	else {                                                                                                                  // С‚Рѕ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРєРѕР»СЊРєРѕ СЃРёРјРІРѕР»РѕРІ РїРµСЂРµРґР°Р»Рё
+		if (button_press (KEY_RIGHT)) { if (caunter_input < 5  ) caunter_input ++; }                                        // РєРЅРѕРїРєР° РІ РїСЂР°РІРѕ, СЃРјРµСЃС‚РёС‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ
+		if (button_press (KEY_LEFT)) {if (caunter_input >( 5 - size)) caunter_input --;}                                    // Р°РЅР°Р»РѕРіРёС‡РЅРѕ СЃРјРµСЃС‚РёС‚СЊ РІ РґСЂСѓРіСѓСЋ СЃС‚РѕСЂРѕРЅСѓ РµСЃР»Рё РјРѕР¶РЅР°
 		if (button_press (KEY_UP)) {
-			if (itedger[caunter_input] - '0' < 9) itedger[caunter_input]  ++;                                               // как и в функции времени проверяем какой символ у нас в элементе буфера и по возможности увеличиваем
+			if (itedger[caunter_input] - '0' < 9) itedger[caunter_input]  ++;                                               // РєР°Рє Рё РІ С„СѓРЅРєС†РёРё РІСЂРµРјРµРЅРё РїСЂРѕРІРµСЂСЏРµРј РєР°РєРѕР№ СЃРёРјРІРѕР» Сѓ РЅР°СЃ РІ СЌР»РµРјРµРЅС‚Рµ Р±СѓС„РµСЂР° Рё РїРѕ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓРІРµР»РёС‡РёРІР°РµРј
 			else if(itedger[caunter_input] - '0' == 9) itedger[caunter_input] = '0';
 		}
 		if (button_press (KEY_DOWN)) {
 			if (itedger[caunter_input] - '0'  > 0) itedger[caunter_input]  --;
 			else if(itedger[caunter_input] - '0'  == 0) itedger[caunter_input]  = '9';
 		}
-		mirror_data = atol (itedger);                                                                                      // тут сканф заменил атол и все работает так же само
-		switch (size){                                                                                                     // это функция для вывода информации без лишних нулей слева
+		mirror_data = atol (itedger);                                                                                      // С‚СѓС‚ СЃРєР°РЅС„ Р·Р°РјРµРЅРёР» Р°С‚РѕР» Рё РІСЃРµ СЂР°Р±РѕС‚Р°РµС‚ С‚Р°Рє Р¶Рµ СЃР°РјРѕ
+		switch (size){                                                                                                     // СЌС‚Рѕ С„СѓРЅРєС†РёСЏ РґР»СЏ РІС‹РІРѕРґР° РёРЅС„РѕСЂРјР°С†РёРё Р±РµР· Р»РёС€РЅРёС… РЅСѓР»РµР№ СЃР»РµРІР°
 			case 0: sprintf(send_buf, "     %01ld"   ,(int32_t) mirror_data ); break; 
 			case 1: sprintf(send_buf, "    %02ld"  ,(int32_t) mirror_data ); break;
 			case 2: sprintf(send_buf, "   %03ld"  ,(int32_t) mirror_data ); break;
@@ -501,11 +501,11 @@ void enter_numbers (uint8_t size )               // можно передавать значение от
 			case 4: sprintf(send_buf, " %05ld"  ,(int32_t) mirror_data ); break;
 			case 5: sprintf(send_buf, "%06ld"  ,(int32_t) mirror_data ); break;
 		}
-		blink_simbol (caunter_input);                                                                                     // моргаем изменяемым символом
+		blink_simbol (caunter_input);                                                                                     // РјРѕСЂРіР°РµРј РёР·РјРµРЅСЏРµРјС‹Рј СЃРёРјРІРѕР»РѕРј
 	}
 }
 
-void enter_float (void)                          // не доработаная функция ввода флоат значения. точка только возле одного знака. нужно править
+void enter_float (void)                          // РЅРµ РґРѕСЂР°Р±РѕС‚Р°РЅР°СЏ С„СѓРЅРєС†РёСЏ РІРІРѕРґР° С„Р»РѕР°С‚ Р·РЅР°С‡РµРЅРёСЏ. С‚РѕС‡РєР° С‚РѕР»СЊРєРѕ РІРѕР·Р»Рµ РѕРґРЅРѕРіРѕ Р·РЅР°РєР°. РЅСѓР¶РЅРѕ РїСЂР°РІРёС‚СЊ
 {
     static uint8_t poz_point;
 	static uint8_t  caunter_input;
@@ -545,67 +545,67 @@ void zero_in_start (void)
 
 void kalib_vp (void)
 {
-    get_zemik_sensors(param.sensor_number);                                                 //  опрашивать датчики
+    get_zemik_sensors(param.sensor_number);                                                 //  РѕРїСЂР°С€РёРІР°С‚СЊ РґР°С‚С‡РёРєРё
     boolean.led_in_menu = true; 
     if (tim_5 == 0 && !boolean.errors){ if (massa < last_massa + param.discret1 *2  && massa > last_massa - param.discret1 *2 ) \
     {send_point(3);}  else {send_non_point(3);}  tim_5 = (param.tim_stab * 1000); last_massa = massa;}     
-    (massa == 0 && !boolean.errors ) ?   send_point (2) : send_non_point(2);   // если масса равна 0 то зажечь светик      
-	if (!change_item){                // пока мы не вводим данные
-    if (boolean.data_ok)  {boolean.data_ok = false; converting_cod_to_massa (); massa = ((massa * param.calib_koef)+0.5);}   // тут получаем реальную массу, без фильтра   
-     	if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}                                // отслеживаем ентер и если что переходим в выполнение ввода
+    (massa == 0 && !boolean.errors ) ?   send_point (2) : send_non_point(2);   // РµСЃР»Рё РјР°СЃСЃР° СЂР°РІРЅР° 0 С‚Рѕ Р·Р°Р¶РµС‡СЊ СЃРІРµС‚РёРє      
+	if (!change_item){                // РїРѕРєР° РјС‹ РЅРµ РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
+    if (boolean.data_ok)  {boolean.data_ok = false; converting_cod_to_massa (); massa = ((massa * param.calib_koef)+0.5);}   // С‚СѓС‚ РїРѕР»СѓС‡Р°РµРј СЂРµР°Р»СЊРЅСѓСЋ РјР°СЃСЃСѓ, Р±РµР· С„РёР»СЊС‚СЂР°   
+     	if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}                                // РѕС‚СЃР»РµР¶РёРІР°РµРј РµРЅС‚РµСЂ Рё РµСЃР»Рё С‡С‚Рѕ РїРµСЂРµС…РѕРґРёРј РІ РІС‹РїРѕР»РЅРµРЅРёРµ РІРІРѕРґР°
         if (button_press (KEY_LEFT))  {zero_funk(1);}    
         if (!boolean.errors) { 
-     	 sprintf(send_buf, "%6ld" , massa );                                                                // показываем значение массы, если ерор то показать ошибку 
+     	 sprintf(send_buf, "%6ld" , massa );                                                                // РїРѕРєР°Р·С‹РІР°РµРј Р·РЅР°С‡РµРЅРёРµ РјР°СЃСЃС‹, РµСЃР»Рё РµСЂРѕСЂ С‚Рѕ РїРѕРєР°Р·Р°С‚СЊ РѕС€РёР±РєСѓ 
          mirror_data = massa; }   else {strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[ERROR4])));  }      
 	}
-	if (change_item){                                                                      // если мы вводим данные
-        if (boolean.data_ok)  {boolean.data_ok = false; converting_cod_to_massa ();}       // тут получаем коды датчиков без К.К
-     	enter_numbers (5);                                                                 // передаем в функцию ввода данных нашу переменную и количество знаков для ввода
-     	if (button_press (KEY_ENTER)) {                                                    // отслеживаем ентер (добавит еепром)
-        change_item = false; non_repit = false; boolean.led_in_menu = false;               // выходим из функции изменения
-        if (mirror_data < param.NPV ){                                                     // если больше НПВ не сохранять
+	if (change_item){                                                                      // РµСЃР»Рё РјС‹ РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
+        if (boolean.data_ok)  {boolean.data_ok = false; converting_cod_to_massa ();}       // С‚СѓС‚ РїРѕР»СѓС‡Р°РµРј РєРѕРґС‹ РґР°С‚С‡РёРєРѕРІ Р±РµР· Рљ.Рљ
+     	enter_numbers (5);                                                                 // РїРµСЂРµРґР°РµРј РІ С„СѓРЅРєС†РёСЋ РІРІРѕРґР° РґР°РЅРЅС‹С… РЅР°С€Сѓ РїРµСЂРµРјРµРЅРЅСѓСЋ Рё РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ РґР»СЏ РІРІРѕРґР°
+     	if (button_press (KEY_ENTER)) {                                                    // РѕС‚СЃР»РµР¶РёРІР°РµРј РµРЅС‚РµСЂ (РґРѕР±Р°РІРёС‚ РµРµРїСЂРѕРј)
+        change_item = false; non_repit = false; boolean.led_in_menu = false;               // РІС‹С…РѕРґРёРј РёР· С„СѓРЅРєС†РёРё РёР·РјРµРЅРµРЅРёСЏ
+        if (mirror_data < param.NPV ){                                                     // РµСЃР»Рё Р±РѕР»СЊС€Рµ РќРџР’ РЅРµ СЃРѕС…СЂР°РЅСЏС‚СЊ
         param.calib_koef = (double) mirror_data / (double) labs(massa);
-        EEPROM_write_float(EE_KALIBKOEF,param.calib_koef); }                                // приравниваем новоезначение в параметр
+        EEPROM_write_float(EE_KALIBKOEF,param.calib_koef); }                                // РїСЂРёСЂР°РІРЅРёРІР°РµРј РЅРѕРІРѕРµР·РЅР°С‡РµРЅРёРµ РІ РїР°СЂР°РјРµС‚СЂ
         else {error_func (ERROR5);}                             
         }             
 	}     
 }
 
-void adress_sens (void)                             // адресация датчиков
+void adress_sens (void)                             // Р°РґСЂРµСЃР°С†РёСЏ РґР°С‚С‡РёРєРѕРІ
 {
-     static uint8_t last_adr;                       // предыдущий адрес
-     if (!change_item){                              // пока не изменяем
-          if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}      // ждем пароль доступа
-          sprintf(send_buf, " START" );                                              // и показываем старт
+     static uint8_t last_adr;                       // РїСЂРµРґС‹РґСѓС‰РёР№ Р°РґСЂРµСЃ
+     if (!change_item){                              // РїРѕРєР° РЅРµ РёР·РјРµРЅСЏРµРј
+          if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}      // Р¶РґРµРј РїР°СЂРѕР»СЊ РґРѕСЃС‚СѓРїР°
+          sprintf(send_buf, " START" );                                              // Рё РїРѕРєР°Р·С‹РІР°РµРј СЃС‚Р°СЂС‚
      }
      if (change_item){
-          if (!non_repit){ non_repit = true;  mirror_data_8bit = get_number_sensor (); last_adr = mirror_data_8bit; }  // при первом заходе сканируем, находим датчик
-          if (mirror_data_8bit == 100) {error_func (ERROR4); change_item = false; non_repit = false; }                 // если там 100 значит какая то ошибка
+          if (!non_repit){ non_repit = true;  mirror_data_8bit = get_number_sensor (); last_adr = mirror_data_8bit; }  // РїСЂРё РїРµСЂРІРѕРј Р·Р°С…РѕРґРµ СЃРєР°РЅРёСЂСѓРµРј, РЅР°С…РѕРґРёРј РґР°С‚С‡РёРє
+          if (mirror_data_8bit == 100) {error_func (ERROR4); change_item = false; non_repit = false; }                 // РµСЃР»Рё С‚Р°Рј 100 Р·РЅР°С‡РёС‚ РєР°РєР°СЏ С‚Рѕ РѕС€РёР±РєР°
           else {
-               if (button_press (KEY_UP)) { if (mirror_data_8bit < 12) mirror_data_8bit ++;  }                              // или плюсуем или отнимаем
+               if (button_press (KEY_UP)) { if (mirror_data_8bit < 12) mirror_data_8bit ++;  }                              // РёР»Рё РїР»СЋСЃСѓРµРј РёР»Рё РѕС‚РЅРёРјР°РµРј
                if (button_press (KEY_DOWN)) {if (mirror_data_8bit > 1) mirror_data_8bit --; }                               //
-               blink_many_simbol (0x30);                                                                     // мигаем двумя правыми символами
-               sprintf(send_buf, "    %02lu"  ,(uint32_t) mirror_data_8bit );                                               // показать то что выбрали (номер датчика)
-               if (button_press (KEY_ENTER)) {                                                                              // по нажатию ентер присвоить новое значение
+               blink_many_simbol (0x30);                                                                     // РјРёРіР°РµРј РґРІСѓРјСЏ РїСЂР°РІС‹РјРё СЃРёРјРІРѕР»Р°РјРё
+               sprintf(send_buf, "    %02lu"  ,(uint32_t) mirror_data_8bit );                                               // РїРѕРєР°Р·Р°С‚СЊ С‚Рѕ С‡С‚Рѕ РІС‹Р±СЂР°Р»Рё (РЅРѕРјРµСЂ РґР°С‚С‡РёРєР°)
+               if (button_press (KEY_ENTER)) {                                                                              // РїРѕ РЅР°Р¶Р°С‚РёСЋ РµРЅС‚РµСЂ РїСЂРёСЃРІРѕРёС‚СЊ РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
                     send_new_adr (last_adr,mirror_data_8bit);
                     change_item = false; non_repit = false;
-                    error_func (NOERROR);                                                                                     // тут нету обратной связи, по этому вот такое подставное ок
+                    error_func (NOERROR);                                                                                     // С‚СѓС‚ РЅРµС‚Сѓ РѕР±СЂР°С‚РЅРѕР№ СЃРІСЏР·Рё, РїРѕ СЌС‚РѕРјСѓ РІРѕС‚ С‚Р°РєРѕРµ РїРѕРґСЃС‚Р°РІРЅРѕРµ РѕРє
                }
           }
      }
 }
 
-void tim_stab_func (void)                  // функция ввода времени стабилизации
+void tim_stab_func (void)                  // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РІСЂРµРјРµРЅРё СЃС‚Р°Р±РёР»РёР·Р°С†РёРё
 {
      enter_8bit (1,15,&param.tim_stab,EE_FILTR,2);
 }
 
-void of_adc_devise (void)                  // функция ввода отключения и показ низкого акб
+void of_adc_devise (void)                  // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РѕС‚РєР»СЋС‡РµРЅРёСЏ Рё РїРѕРєР°Р· РЅРёР·РєРѕРіРѕ Р°РєР±
 {
   enter_8bit (0,1,&param.of_adc,EE_OF_ADC,2);
 }
 
-void enter_8bit (uint8_t min, uint8_t max, uint8_t *paramet, uint16_t eeprom, uint8_t size)    // функция ввода числа 8бит
+void enter_8bit (uint8_t min, uint8_t max, uint8_t *paramet, uint16_t eeprom, uint8_t size)    // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° С‡РёСЃР»Р° 8Р±РёС‚
 {
      if (!change_item){
           if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}
@@ -623,61 +623,61 @@ void enter_8bit (uint8_t min, uint8_t max, uint8_t *paramet, uint16_t eeprom, ui
      }     
 }
 
-void individual_koef (void)  // функция ввода индивидуальных коэфф
+void individual_koef (void)  // С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РёРЅРґРёРІРёРґСѓР°Р»СЊРЅС‹С… РєРѕСЌС„С„
 {
-    get_zemik_sensors(param.sensor_number);                                                                  //  опрашивать датчики
-    if (boolean.data_ok)  {boolean.data_ok = false; converting_cod_to_massa (); massa = ((massa * param.calib_koef)+0.5);}   // тут получаем реальную массу, 
-    if (!boolean.non_rep){ boolean.non_rep = true; boolean.led_in_menu = true; mirror_data_8bit = 1; mirror_double2 = 0; }    // при входе сбросить счетчики и показания второго зеркала
+    get_zemik_sensors(param.sensor_number);                                                                  //  РѕРїСЂР°С€РёРІР°С‚СЊ РґР°С‚С‡РёРєРё
+    if (boolean.data_ok)  {boolean.data_ok = false; converting_cod_to_massa (); massa = ((massa * param.calib_koef)+0.5);}   // С‚СѓС‚ РїРѕР»СѓС‡Р°РµРј СЂРµР°Р»СЊРЅСѓСЋ РјР°СЃСЃСѓ, 
+    if (!boolean.non_rep){ boolean.non_rep = true; boolean.led_in_menu = true; mirror_data_8bit = 1; mirror_double2 = 0; }    // РїСЂРё РІС…РѕРґРµ СЃР±СЂРѕСЃРёС‚СЊ СЃС‡РµС‚С‡РёРєРё Рё РїРѕРєР°Р·Р°РЅРёСЏ РІС‚РѕСЂРѕРіРѕ Р·РµСЂРєР°Р»Р°
     if (tim_5 == 0 && !boolean.errors){ if (massa < last_massa + param.discret1 *2  && massa > last_massa - param.discret1 *2 ) \
-    {send_point(3);}  else {send_non_point(3);}  tim_5 = (param.tim_stab * 1000); last_massa = massa;}    // стабилизация
-    (massa == 0 && !boolean.errors ) ?   send_point (2) : send_non_point(2);   // если масса равна 0 то зажечь светик    
-         if (!change_item){                // пока мы не вводим данные
-              if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}                                // отслеживаем ентер и если что переходим в выполнение ввода
-              if (button_press (KEY_UP))   { if(mirror_data_8bit < param.sensor_number) mirror_data_8bit ++; }     // перемещаемся вверх-вниз по номерам датчиков
+    {send_point(3);}  else {send_non_point(3);}  tim_5 = (param.tim_stab * 1000); last_massa = massa;}    // СЃС‚Р°Р±РёР»РёР·Р°С†РёСЏ
+    (massa == 0 && !boolean.errors ) ?   send_point (2) : send_non_point(2);   // РµСЃР»Рё РјР°СЃСЃР° СЂР°РІРЅР° 0 С‚Рѕ Р·Р°Р¶РµС‡СЊ СЃРІРµС‚РёРє    
+         if (!change_item){                // РїРѕРєР° РјС‹ РЅРµ РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
+              if (not_change()) if (button_press (KEY_ENTER)) {change_item = true;}                                // РѕС‚СЃР»РµР¶РёРІР°РµРј РµРЅС‚РµСЂ Рё РµСЃР»Рё С‡С‚Рѕ РїРµСЂРµС…РѕРґРёРј РІ РІС‹РїРѕР»РЅРµРЅРёРµ РІРІРѕРґР°
+              if (button_press (KEY_UP))   { if(mirror_data_8bit < param.sensor_number) mirror_data_8bit ++; }     // РїРµСЂРµРјРµС‰Р°РµРјСЃСЏ РІРІРµСЂС…-РІРЅРёР· РїРѕ РЅРѕРјРµСЂР°Рј РґР°С‚С‡РёРєРѕРІ
               if (button_press (KEY_DOWN)) { if(mirror_data_8bit > 1) mirror_data_8bit --; }
-              sprintf(send_buf, "    %2lu"  ,(uint32_t) mirror_data_8bit );                                        // и показываем номер датчика
+              sprintf(send_buf, "    %2lu"  ,(uint32_t) mirror_data_8bit );                                        // Рё РїРѕРєР°Р·С‹РІР°РµРј РЅРѕРјРµСЂ РґР°С‚С‡РёРєР°
          }
-         if (change_item){                                                                              // если мы вводим данные
-              if (!boolean.errors && boolean.led_display == 0x03) {sprintf(send_buf, "%6ld" ,massa ); *point_metrologi = mirror_double;}  // если показ 3 экрана и нет ошибок, то это масса
-              if ( boolean.errors && boolean.led_display == 0x03) {strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[ERROR4]))); }   // если показ 3 экрана и есть ошибки то это ерр
-              if(boolean.led_display < 4){ if (button_press (KEY_ENTER)) {                        // отслеживаем ентер 
-              change_item = false;  boolean.led_in_menu = false; eeprom_calib_sens();  boolean.led_display = 0x00; *point_metrologi = mirror_double;}} // выходим из функции изменения, сохранаяем в память, сбрасываем экраны, указателю присваиваем новое значение
-              if(boolean.led_display == 4){ if (button_press (KEY_ENTER)) {                        // отслеживаем ентер 
-                 boolean.led_display = 0x00;                               // сбрасываем номер экрана
+         if (change_item){                                                                              // РµСЃР»Рё РјС‹ РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
+              if (!boolean.errors && boolean.led_display == 0x03) {sprintf(send_buf, "%6ld" ,massa ); *point_metrologi = mirror_double;}  // РµСЃР»Рё РїРѕРєР°Р· 3 СЌРєСЂР°РЅР° Рё РЅРµС‚ РѕС€РёР±РѕРє, С‚Рѕ СЌС‚Рѕ РјР°СЃСЃР°
+              if ( boolean.errors && boolean.led_display == 0x03) {strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[ERROR4]))); }   // РµСЃР»Рё РїРѕРєР°Р· 3 СЌРєСЂР°РЅР° Рё РµСЃС‚СЊ РѕС€РёР±РєРё С‚Рѕ СЌС‚Рѕ РµСЂСЂ
+              if(boolean.led_display < 4){ if (button_press (KEY_ENTER)) {                        // РѕС‚СЃР»РµР¶РёРІР°РµРј РµРЅС‚РµСЂ 
+              change_item = false;  boolean.led_in_menu = false; eeprom_calib_sens();  boolean.led_display = 0x00; *point_metrologi = mirror_double;}} // РІС‹С…РѕРґРёРј РёР· С„СѓРЅРєС†РёРё РёР·РјРµРЅРµРЅРёСЏ, СЃРѕС…СЂР°РЅР°СЏРµРј РІ РїР°РјСЏС‚СЊ, СЃР±СЂР°СЃС‹РІР°РµРј СЌРєСЂР°РЅС‹, СѓРєР°Р·Р°С‚РµР»СЋ РїСЂРёСЃРІР°РёРІР°РµРј РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
+              if(boolean.led_display == 4){ if (button_press (KEY_ENTER)) {                        // РѕС‚СЃР»РµР¶РёРІР°РµРј РµРЅС‚РµСЂ 
+                 boolean.led_display = 0x00;                               // СЃР±СЂР°СЃС‹РІР°РµРј РЅРѕРјРµСЂ СЌРєСЂР°РЅР°
                  if (mirror_double < 10){
-                 *point_metrologi = mirror_double;                         // указателю присваиваем новое значение
-                 eeprom_calib_sens(); } else {error_func (ERROR5); non_repit = false;}  }}    // выходим из функции изменения, сохраняем             
-              if(boolean.led_display == 4) {enter_float (); }              // если это 4 экран, то ввод флоат и другой обработчик кнопок
-              else {                                                       // а если любой другой
+                 *point_metrologi = mirror_double;                         // СѓРєР°Р·Р°С‚РµР»СЋ РїСЂРёСЃРІР°РёРІР°РµРј РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
+                 eeprom_calib_sens(); } else {error_func (ERROR5); non_repit = false;}  }}    // РІС‹С…РѕРґРёРј РёР· С„СѓРЅРєС†РёРё РёР·РјРµРЅРµРЅРёСЏ, СЃРѕС…СЂР°РЅСЏРµРј             
+              if(boolean.led_display == 4) {enter_float (); }              // РµСЃР»Рё СЌС‚Рѕ 4 СЌРєСЂР°РЅ, С‚Рѕ РІРІРѕРґ С„Р»РѕР°С‚ Рё РґСЂСѓРіРѕР№ РѕР±СЂР°Р±РѕС‚С‡РёРє РєРЅРѕРїРѕРє
+              else {                                                       // Р° РµСЃР»Рё Р»СЋР±РѕР№ РґСЂСѓРіРѕР№
                 if (button_press (KEY_LEFT)) {
-                     if (boolean.led_display == 2) boolean.led_display = 0x04;  // кнопка в лево делает активным 4 экран
+                     if (boolean.led_display == 2) boolean.led_display = 0x04;  // РєРЅРѕРїРєР° РІ Р»РµРІРѕ РґРµР»Р°РµС‚ Р°РєС‚РёРІРЅС‹Рј 4 СЌРєСЂР°РЅ
                 }
                 if (button_press (KEY_RIGHT)) {
-                     boolean.led_display ^= 0x01;                          // кнопка в право переключает между выводом массы и коэфф
+                     boolean.led_display ^= 0x01;                          // РєРЅРѕРїРєР° РІ РїСЂР°РІРѕ РїРµСЂРµРєР»СЋС‡Р°РµС‚ РјРµР¶РґСѓ РІС‹РІРѕРґРѕРј РјР°СЃСЃС‹ Рё РєРѕСЌС„С„
                 }
                 if (button_press (KEY_UP)) {
-                     case_up_down (1, 0.00001);                            // нажатие добавляет чучуть
+                     case_up_down (1, 0.00001);                            // РЅР°Р¶Р°С‚РёРµ РґРѕР±Р°РІР»СЏРµС‚ С‡СѓС‡СѓС‚СЊ
                 }
                 if (button_press (KEY_DOWN)) {
                      case_up_down(2, 0.00001);
                 }
                 if (button_long_press (KEY_UP)) {
-                     case_up_down (1, 0.00011);                            // удержание добавляет больше
+                     case_up_down (1, 0.00011);                            // СѓРґРµСЂР¶Р°РЅРёРµ РґРѕР±Р°РІР»СЏРµС‚ Р±РѕР»СЊС€Рµ
                 }
                 if (button_long_press (KEY_DOWN)) {
                      case_up_down(2, 0.00011);
                 }
               }              
-              if(boolean.led_display == 0)case_up_down(0,0);               // для 0 дисплея, чтоб один раз сработать и записать в промежуточную переменную число
-              if(boolean.led_display == 2)case_up_down(0,0);               // для 2 дисплея, чтоб показывать текущий коэфф
+              if(boolean.led_display == 0)case_up_down(0,0);               // РґР»СЏ 0 РґРёСЃРїР»РµСЏ, С‡С‚РѕР± РѕРґРёРЅ СЂР°Р· СЃСЂР°Р±РѕС‚Р°С‚СЊ Рё Р·Р°РїРёСЃР°С‚СЊ РІ РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ С‡РёСЃР»Рѕ
+              if(boolean.led_display == 2)case_up_down(0,0);               // РґР»СЏ 2 РґРёСЃРїР»РµСЏ, С‡С‚РѕР± РїРѕРєР°Р·С‹РІР°С‚СЊ С‚РµРєСѓС‰РёР№ РєРѕСЌС„С„
          }        
 }
 
-void case_up_down (uint8_t up_down, double increment)                      // промежуточная функция ввода коэфф
+void case_up_down (uint8_t up_down, double increment)                      // РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅР°СЏ С„СѓРЅРєС†РёСЏ РІРІРѕРґР° РєРѕСЌС„С„
 {
-     switch (mirror_data_8bit)                                             // в завиимости от того какой номер датчика выбран
+     switch (mirror_data_8bit)                                             // РІ Р·Р°РІРёРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ РєР°РєРѕР№ РЅРѕРјРµСЂ РґР°С‚С‡РёРєР° РІС‹Р±СЂР°РЅ
      {
-          case 1: point_metrologi  = &metrology.koef_sensor1; break;       // указателю присваиваем адрес в памяти нужного коэфф
+          case 1: point_metrologi  = &metrology.koef_sensor1; break;       // СѓРєР°Р·Р°С‚РµР»СЋ РїСЂРёСЃРІР°РёРІР°РµРј Р°РґСЂРµСЃ РІ РїР°РјСЏС‚Рё РЅСѓР¶РЅРѕРіРѕ РєРѕСЌС„С„
           case 2: point_metrologi  = &metrology.koef_sensor2; break;
           case 3: point_metrologi  = &metrology.koef_sensor3; break;
           case 4: point_metrologi  = &metrology.koef_sensor4; break;
@@ -690,28 +690,28 @@ void case_up_down (uint8_t up_down, double increment)                      // пр
           case 11: point_metrologi = &metrology.koef_sensor11; break;
           case 12: point_metrologi = &metrology.koef_sensor12; break;                  
      }
-          // mirror_double2 нужен для того чтоб при изменении коэф во время ввода(и показа массы) все менялось в реальном времени, а в случае нажатия ЕСК выйти без сохранения, прошлое значение хранится в этой переменной
-          if (up_down == 1){ if (mirror_double < 10) mirror_double += increment; } if(up_down == 2){if (mirror_double > 0) mirror_double -= increment; }  // если вывали с 1 то плюсуем с 2 то минусуем
-          if(boolean.led_display == 0){sprintf(send_buf, "%f" , mirror_double ); mirror_double = *point_metrologi;boolean.led_display = 2; mirror_double2 = *point_metrologi;}  // один раз обновить переписать значения коэфф
-          if(boolean.led_display == 2){sprintf(send_buf, "%f" , mirror_double );}     // а потом показывать уже просто зеркало этого значения
+          // mirror_double2 РЅСѓР¶РµРЅ РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР± РїСЂРё РёР·РјРµРЅРµРЅРёРё РєРѕСЌС„ РІРѕ РІСЂРµРјСЏ РІРІРѕРґР°(Рё РїРѕРєР°Р·Р° РјР°СЃСЃС‹) РІСЃРµ РјРµРЅСЏР»РѕСЃСЊ РІ СЂРµР°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё, Р° РІ СЃР»СѓС‡Р°Рµ РЅР°Р¶Р°С‚РёСЏ Р•РЎРљ РІС‹Р№С‚Рё Р±РµР· СЃРѕС…СЂР°РЅРµРЅРёСЏ, РїСЂРѕС€Р»РѕРµ Р·РЅР°С‡РµРЅРёРµ С…СЂР°РЅРёС‚СЃСЏ РІ СЌС‚РѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
+          if (up_down == 1){ if (mirror_double < 10) mirror_double += increment; } if(up_down == 2){if (mirror_double > 0) mirror_double -= increment; }  // РµСЃР»Рё РІС‹РІР°Р»Рё СЃ 1 С‚Рѕ РїР»СЋСЃСѓРµРј СЃ 2 С‚Рѕ РјРёРЅСѓСЃСѓРµРј
+          if(boolean.led_display == 0){sprintf(send_buf, "%f" , mirror_double ); mirror_double = *point_metrologi;boolean.led_display = 2; mirror_double2 = *point_metrologi;}  // РѕРґРёРЅ СЂР°Р· РѕР±РЅРѕРІРёС‚СЊ РїРµСЂРµРїРёСЃР°С‚СЊ Р·РЅР°С‡РµРЅРёСЏ РєРѕСЌС„С„
+          if(boolean.led_display == 2){sprintf(send_buf, "%f" , mirror_double );}     // Р° РїРѕС‚РѕРј РїРѕРєР°Р·С‹РІР°С‚СЊ СѓР¶Рµ РїСЂРѕСЃС‚Рѕ Р·РµСЂРєР°Р»Рѕ СЌС‚РѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 }
 
-void enter_no_pay (void)                                                   // снятие блокировки ерр36
+void enter_no_pay (void)                                                   // СЃРЅСЏС‚РёРµ Р±Р»РѕРєРёСЂРѕРІРєРё РµСЂСЂ36
 {
-     if (!boolean.change_item_mirr){                                       // новая функция выполнения/не выполнения (так как другая задействована в вводе часов)
+     if (!boolean.change_item_mirr){                                       // РЅРѕРІР°СЏ С„СѓРЅРєС†РёСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ/РЅРµ РІС‹РїРѕР»РЅРµРЅРёСЏ (С‚Р°Рє РєР°Рє РґСЂСѓРіР°СЏ Р·Р°РґРµР№СЃС‚РІРѕРІР°РЅР° РІ РІРІРѕРґРµ С‡Р°СЃРѕРІ)
            if (button_press (KEY_ENTER)) {boolean.change_item_mirr = true;}
           sprintf(send_buf, "000000"  );massa = 0;mirror_data = 0; }
 	 if (boolean.change_item_mirr){
-       switch (massa) {                                                    // используем массу не по назначению))
+       switch (massa) {                                                    // РёСЃРїРѕР»СЊР·СѓРµРј РјР°СЃСЃСѓ РЅРµ РїРѕ РЅР°Р·РЅР°С‡РµРЅРёСЋ))
            case 0: enter_numbers (5);   
            if (button_press (KEY_ENTER)) {
-             if (mirror_data ==  param.pasw_err) {massa = 1;non_repit = false;mirror_data = 0;  EEPROM_write(EE_ERRPR36, 0); param.err36 = 0;  }   // если пароль совпадает с тем что ввели снимаем блокировку
-          	 else { error_func(ERROR5);boolean.change_item_mirr = false; non_repit = false;}                                                       // нет ерр5   
+             if (mirror_data ==  param.pasw_err) {massa = 1;non_repit = false;mirror_data = 0;  EEPROM_write(EE_ERRPR36, 0); param.err36 = 0;  }   // РµСЃР»Рё РїР°СЂРѕР»СЊ СЃРѕРІРїР°РґР°РµС‚ СЃ С‚РµРј С‡С‚Рѕ РІРІРµР»Рё СЃРЅРёРјР°РµРј Р±Р»РѕРєРёСЂРѕРІРєСѓ
+          	 else { error_func(ERROR5);boolean.change_item_mirr = false; non_repit = false;}                                                       // РЅРµС‚ РµСЂСЂ5   
            } break;
-           case 1: enter_1307(&param.data_err, &param.mount_err, &param.year_err, 2);   break;                                                     // вводим новую дату блокировки            
+           case 1: enter_1307(&param.data_err, &param.mount_err, &param.year_err, 2);   break;                                                     // РІРІРѕРґРёРј РЅРѕРІСѓСЋ РґР°С‚Сѓ Р±Р»РѕРєРёСЂРѕРІРєРё            
            case 2: enter_numbers (5); 
            if (button_press (KEY_ENTER)) {
-            param.pasw_err = mirror_data; EEPROM_write_32t(EE_PSWRD1,param.pasw_err);boolean.change_item_mirr = false; go_func = false;non_repit = false;} break;   // вводим новый пароль и записываем его в память      
+            param.pasw_err = mirror_data; EEPROM_write_32t(EE_PSWRD1,param.pasw_err);boolean.change_item_mirr = false; go_func = false;non_repit = false;} break;   // РІРІРѕРґРёРј РЅРѕРІС‹Р№ РїР°СЂРѕР»СЊ Рё Р·Р°РїРёСЃС‹РІР°РµРј РµРіРѕ РІ РїР°РјСЏС‚СЊ      
        }              
     }
 }

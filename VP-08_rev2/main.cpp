@@ -6,14 +6,14 @@
 #include "UART.h"
 #include "RTC1307.h"
 #include "EEprom.h"
-//--------------переменные из других файлов---------------//
+//--------------РїРµСЂРµРјРµРЅРЅС‹Рµ РёР· РґСЂСѓРіРёС… С„Р°Р№Р»РѕРІ---------------//
 extern  char send_buf [20];
 extern struct DS1307 DS;
 extern uint16_t tim_1, tim_3,tim_5,tim_6,sens_cod_led,adc;
 extern struct parametrs param;
 extern struct metrologis metrology;
 extern struct bool_date boolean;
-//--------------переменные из этого файла-----------------//
+//--------------РїРµСЂРµРјРµРЅРЅС‹Рµ РёР· СЌС‚РѕРіРѕ С„Р°Р№Р»Р°-----------------//
 uint8_t mein_display,eror_sens_up;
 int32_t massa, last_massa,massa_after_filtr;
 struct filtros filtr;
@@ -25,124 +25,124 @@ struct filtros filtr;
 
 int main(void)
 {
-     init_atmega ();                 // инициализируем всю переферию
-     init_max7219 ();                // инициализируем матрицу, сюда надо добавить включение с разным уровнем яркости
-     for (int t = 0; t < 7; t++)     // тупая функция для того чтоб экран при включении не показывал всякую дичь!
+     init_atmega ();                 // РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РІСЃСЋ РїРµСЂРµС„РµСЂРёСЋ
+     init_max7219 ();                // РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РјР°С‚СЂРёС†Сѓ, СЃСЋРґР° РЅР°РґРѕ РґРѕР±Р°РІРёС‚СЊ РІРєР»СЋС‡РµРЅРёРµ СЃ СЂР°Р·РЅС‹Рј СѓСЂРѕРІРЅРµРј СЏСЂРєРѕСЃС‚Рё
+     for (int t = 0; t < 7; t++)     // С‚СѓРїР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР± СЌРєСЂР°РЅ РїСЂРё РІРєР»СЋС‡РµРЅРёРё РЅРµ РїРѕРєР°Р·С‹РІР°Р» РІСЃСЏРєСѓСЋ РґРёС‡СЊ!
      {send_buf [t] = 0x00;}
      indication ();
-     #ifndef DEBUG_MOD                // отключаем в дебаге
-     start ();                        // кнопка включения
-     zastavka ();                     // и рисовалка символов
+     #ifndef DEBUG_MOD                // РѕС‚РєР»СЋС‡Р°РµРј РІ РґРµР±Р°РіРµ
+     start ();                        // РєРЅРѕРїРєР° РІРєР»СЋС‡РµРЅРёСЏ
+     zastavka ();                     // Рё СЂРёСЃРѕРІР°Р»РєР° СЃРёРјРІРѕР»РѕРІ
      #endif
-     I2C_init();                      // инициализируем скорость I2C
-     sei ();                          // разрешаем прерывания. раньше нельзя, так как тогда провалимся в SPI прерывание от стартового рисунка
-     DS_Write_init_date();            // если часы были сброшены, то перевести их на 90 год и запустить
-     enter_password_init();           // ввод пароля на инициализацию или сброс ерр36
-     read_ALL_EEprom();               // читаем из eeprom все переменные
-     init_after_EEprom();             // инициализируем те параметры что зависят от еепром
+     I2C_init();                      // РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЃРєРѕСЂРѕСЃС‚СЊ I2C
+     sei ();                          // СЂР°Р·СЂРµС€Р°РµРј РїСЂРµСЂС‹РІР°РЅРёСЏ. СЂР°РЅСЊС€Рµ РЅРµР»СЊР·СЏ, С‚Р°Рє РєР°Рє С‚РѕРіРґР° РїСЂРѕРІР°Р»РёРјСЃСЏ РІ SPI РїСЂРµСЂС‹РІР°РЅРёРµ РѕС‚ СЃС‚Р°СЂС‚РѕРІРѕРіРѕ СЂРёСЃСѓРЅРєР°
+     DS_Write_init_date();            // РµСЃР»Рё С‡Р°СЃС‹ Р±С‹Р»Рё СЃР±СЂРѕС€РµРЅС‹, С‚Рѕ РїРµСЂРµРІРµСЃС‚Рё РёС… РЅР° 90 РіРѕРґ Рё Р·Р°РїСѓСЃС‚РёС‚СЊ
+     enter_password_init();           // РІРІРѕРґ РїР°СЂРѕР»СЏ РЅР° РёРЅРёС†РёР°Р»РёР·Р°С†РёСЋ РёР»Рё СЃР±СЂРѕСЃ РµСЂСЂ36
+     read_ALL_EEprom();               // С‡РёС‚Р°РµРј РёР· eeprom РІСЃРµ РїРµСЂРµРјРµРЅРЅС‹Рµ
+     init_after_EEprom();             // РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј С‚Рµ РїР°СЂР°РјРµС‚СЂС‹ С‡С‚Рѕ Р·Р°РІРёСЃСЏС‚ РѕС‚ РµРµРїСЂРѕРј
      for (;;)
      {
           
-       if (!boolean.main_menu_bool) {                    // если нет ошибок и ерр36 то передаем в табло  а так же отслеживаем кнопку включения и проверяем не сработал ли ерр36
-           if(boolean.funck1){boolean.funck1 = false;  if (!boolean.errors && !param.err36){TABLO_print(massa_after_filtr); }}  // с одной переодичностью делать вот это
+       if (!boolean.main_menu_bool) {                    // РµСЃР»Рё РЅРµС‚ РѕС€РёР±РѕРє Рё РµСЂСЂ36 С‚Рѕ РїРµСЂРµРґР°РµРј РІ С‚Р°Р±Р»Рѕ  Р° С‚Р°Рє Р¶Рµ РѕС‚СЃР»РµР¶РёРІР°РµРј РєРЅРѕРїРєСѓ РІРєР»СЋС‡РµРЅРёСЏ Рё РїСЂРѕРІРµСЂСЏРµРј РЅРµ СЃСЂР°Р±РѕС‚Р°Р» Р»Рё РµСЂСЂ36
+           if(boolean.funck1){boolean.funck1 = false;  if (!boolean.errors && !param.err36){TABLO_print(massa_after_filtr); }}  // СЃ РѕРґРЅРѕР№ РїРµСЂРµРѕРґРёС‡РЅРѕСЃС‚СЊСЋ РґРµР»Р°С‚СЊ РІРѕС‚ СЌС‚Рѕ
            if(boolean.funck2){boolean.funck2 = false; DS_Read(); off_key(); parser_visl(); }
            if(boolean.funck3){boolean.funck3 = false; adc_read_of();  no_pay_wizard();  reply_visl(); }     
-           get_zemik_sensors(param.sensor_number);      //                                                          // с другой переодичностью опрашивать датчики
-           if (button_press (KEY_DOWN)) {  (mein_display < 2) ? mein_display ++ : mein_display = 0; }      // кнопки вверх и вниз показать основные экраны
-           if (button_press (KEY_UP))   {  (mein_display > 0) ? mein_display -- : mein_display = 2;}       // впервые тернарный оператор. если больше нуля отнимаем, если ноль то делаем 2 
-           if (button_press (KEY_ENTER)) {boolean.main_menu_bool = 1; init_menu();   }                     // если нажали ентер переходим в меню  
-           if (!boolean.errors) {                                                                          // если еерр датчиков то не отслеживать тару и ноль      
+           get_zemik_sensors(param.sensor_number);      //                                                          // СЃ РґСЂСѓРіРѕР№ РїРµСЂРµРѕРґРёС‡РЅРѕСЃС‚СЊСЋ РѕРїСЂР°С€РёРІР°С‚СЊ РґР°С‚С‡РёРєРё
+           if (button_press (KEY_DOWN)) {  (mein_display < 2) ? mein_display ++ : mein_display = 0; }      // РєРЅРѕРїРєРё РІРІРµСЂС… Рё РІРЅРёР· РїРѕРєР°Р·Р°С‚СЊ РѕСЃРЅРѕРІРЅС‹Рµ СЌРєСЂР°РЅС‹
+           if (button_press (KEY_UP))   {  (mein_display > 0) ? mein_display -- : mein_display = 2;}       // РІРїРµСЂРІС‹Рµ С‚РµСЂРЅР°СЂРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ. РµСЃР»Рё Р±РѕР»СЊС€Рµ РЅСѓР»СЏ РѕС‚РЅРёРјР°РµРј, РµСЃР»Рё РЅРѕР»СЊ С‚Рѕ РґРµР»Р°РµРј 2 
+           if (button_press (KEY_ENTER)) {boolean.main_menu_bool = 1; init_menu();   }                     // РµСЃР»Рё РЅР°Р¶Р°Р»Рё РµРЅС‚РµСЂ РїРµСЂРµС…РѕРґРёРј РІ РјРµРЅСЋ  
+           if (!boolean.errors) {                                                                          // РµСЃР»Рё РµРµСЂСЂ РґР°С‚С‡РёРєРѕРІ С‚Рѕ РЅРµ РѕС‚СЃР»РµР¶РёРІР°С‚СЊ С‚Р°СЂСѓ Рё РЅРѕР»СЊ      
              if ((button_press (KEY_RIGHT)) || boolean.uart_tara){  if (!boolean.tara_ok) { metrology.tara = massa_after_filtr;} boolean.tara_ok = !boolean.tara_ok; boolean.uart_tara = false;} 
-             // если нажали тару, тарируем, и поднимаем флаг что тарировано
+             // РµСЃР»Рё РЅР°Р¶Р°Р»Рё С‚Р°СЂСѓ, С‚Р°СЂРёСЂСѓРµРј, Рё РїРѕРґРЅРёРјР°РµРј С„Р»Р°Рі С‡С‚Рѕ С‚Р°СЂРёСЂРѕРІР°РЅРѕ
              if ((button_press (KEY_LEFT)) || boolean.uart_zero) {  if (!boolean.first_zero) { if ((param.NPV / 4) > labs(massa_after_filtr + metrology.tara)) {zero_funk(0);boolean.first_zero = true;boolean.state_zero = 2;metrology.tara = 0;}\
              else {error_func (NO);boolean.state_zero = 1;}} else {if((param.NPV / 25 )> labs(massa_after_filtr + metrology.tara)) {zero_funk(0);boolean.state_zero = 2;metrology.tara = 0;} else {error_func (NO);boolean.state_zero = 1;}}  boolean.uart_zero = false;}
-             // функция обнуления, если опущен флаг первого обнуления то проверяем меньше ли текущая масса чем 25%, если да то обнуляем и поднимаем флаг первого обнуления. а если флаг поднят то проверяем уже на 4%
+             // С„СѓРЅРєС†РёСЏ РѕР±РЅСѓР»РµРЅРёСЏ, РµСЃР»Рё РѕРїСѓС‰РµРЅ С„Р»Р°Рі РїРµСЂРІРѕРіРѕ РѕР±РЅСѓР»РµРЅРёСЏ С‚Рѕ РїСЂРѕРІРµСЂСЏРµРј РјРµРЅСЊС€Рµ Р»Рё С‚РµРєСѓС‰Р°СЏ РјР°СЃСЃР° С‡РµРј 25%, РµСЃР»Рё РґР° С‚Рѕ РѕР±РЅСѓР»СЏРµРј Рё РїРѕРґРЅРёРјР°РµРј С„Р»Р°Рі РїРµСЂРІРѕРіРѕ РѕР±РЅСѓР»РµРЅРёСЏ. Р° РµСЃР»Рё С„Р»Р°Рі РїРѕРґРЅСЏС‚ С‚Рѕ РїСЂРѕРІРµСЂСЏРµРј СѓР¶Рµ РЅР° 4%
              if(!boolean.avto_zero) {if (param.zero_start && boolean.data_ok) { if (!boolean.first_zero) { if ((param.NPV / 4) > labs(massa_after_filtr)) {zero_funk(0);} boolean.first_zero = true; boolean.avto_zero = true;}}}
-             // тоже самое только для авто нуля.                  
+             // С‚РѕР¶Рµ СЃР°РјРѕРµ С‚РѕР»СЊРєРѕ РґР»СЏ Р°РІС‚Рѕ РЅСѓР»СЏ.                  
            }       
-           if (!param.err36 && !boolean.err_adc){         // если нет ошибок основные дисплеи             
+           if (!param.err36 && !boolean.err_adc){         // РµСЃР»Рё РЅРµС‚ РѕС€РёР±РѕРє РѕСЃРЅРѕРІРЅС‹Рµ РґРёСЃРїР»РµРё             
 
-                switch (mein_display)                     // основные дисплеи
+                switch (mein_display)                     // РѕСЃРЅРѕРІРЅС‹Рµ РґРёСЃРїР»РµРё
                {
                     case 0: filtr_massa(param.filtr);   break;
                     case 1: sprintf(send_buf, "%02d.%02d.%02d." ,  DS.hour,DS.min,DS.sec);    error_buzzer(false);       break;
                     case 2: sprintf(send_buf, "%02d.%02d.%02d." ,  DS.date,DS.month,DS.year); error_buzzer(false);       break;
-                    case 3: if(!tim_6) { mein_display = 0; boolean.start_delay = 1; }strcpy_P(send_buf, (PGM_P)pgm_read_word(&(er_sens[12]))); adc_read_of(); filtr_massa(param.filtr); break;     // при старте показать вот это чтоб все успело включится
+                    case 3: if(!tim_6) { mein_display = 0; boolean.start_delay = 1; }strcpy_P(send_buf, (PGM_P)pgm_read_word(&(er_sens[12]))); adc_read_of(); filtr_massa(param.filtr); break;     // РїСЂРё СЃС‚Р°СЂС‚Рµ РїРѕРєР°Р·Р°С‚СЊ РІРѕС‚ СЌС‚Рѕ С‡С‚РѕР± РІСЃРµ СѓСЃРїРµР»Рѕ РІРєР»СЋС‡РёС‚СЃСЏ
                }              
            } 
-           else {                                        // если есть то показывать их
+           else {                                        // РµСЃР»Рё РµСЃС‚СЊ С‚Рѕ РїРѕРєР°Р·С‹РІР°С‚СЊ РёС…
                    while (1)
                    {
-                       if (boolean.err_adc) { strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[BAT])));  break; }     // акум
-                       if (param.err36) {strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[ERROR36])));  break;  }     // ерр36
+                       if (boolean.err_adc) { strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[BAT])));  break; }     // Р°РєСѓРј
+                       if (param.err36) {strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[ERROR36])));  break;  }     // РµСЂСЂ36
                        break;       
                    }                          
                 }
       }            
-        if (boolean.main_menu_bool) { main_menu (); error_buzzer(false);}       // если мы в меню, то показываем только его. 
-        err_and_led (); // следим за выключением светиков  
+        if (boolean.main_menu_bool) { main_menu (); error_buzzer(false);}       // РµСЃР»Рё РјС‹ РІ РјРµРЅСЋ, С‚Рѕ РїРѕРєР°Р·С‹РІР°РµРј С‚РѕР»СЊРєРѕ РµРіРѕ. 
+        err_and_led (); // СЃР»РµРґРёРј Р·Р° РІС‹РєР»СЋС‡РµРЅРёРµРј СЃРІРµС‚РёРєРѕРІ  
                                                                       
     }
 }
 
 void adc_read_of (void)
 {
-    static uint8_t caunt_filtr;            // счетчик перемещения по кейсам
-    static uint16_t adc_filtr;             // итоговая переменная
-	static uint16_t filtr_adc [10];        // создали дабл переменную для хранения промежуточного вычисления
-    if (adc > 800 ) {send_point (4);} else {send_non_point(4);}   // зажечь или погасить светик сети можно менять при каком коде 
-    if (param.of_adc){                                            // если вкл параметр отключения при разряде
-    filtr_adc [caunt_filtr] = adc;                                // бегущее среднее
+    static uint8_t caunt_filtr;            // СЃС‡РµС‚С‡РёРє РїРµСЂРµРјРµС‰РµРЅРёСЏ РїРѕ РєРµР№СЃР°Рј
+    static uint16_t adc_filtr;             // РёС‚РѕРіРѕРІР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ
+	static uint16_t filtr_adc [10];        // СЃРѕР·РґР°Р»Рё РґР°Р±Р» РїРµСЂРµРјРµРЅРЅСѓСЋ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕРіРѕ РІС‹С‡РёСЃР»РµРЅРёСЏ
+    if (adc > 800 ) {send_point (4);} else {send_non_point(4);}   // Р·Р°Р¶РµС‡СЊ РёР»Рё РїРѕРіР°СЃРёС‚СЊ СЃРІРµС‚РёРє СЃРµС‚Рё РјРѕР¶РЅРѕ РјРµРЅСЏС‚СЊ РїСЂРё РєР°РєРѕРј РєРѕРґРµ 
+    if (param.of_adc){                                            // РµСЃР»Рё РІРєР» РїР°СЂР°РјРµС‚СЂ РѕС‚РєР»СЋС‡РµРЅРёСЏ РїСЂРё СЂР°Р·СЂСЏРґРµ
+    filtr_adc [caunt_filtr] = adc;                                // Р±РµРіСѓС‰РµРµ СЃСЂРµРґРЅРµРµ
     for (int i = 0; i < 10; i ++) { adc_filtr += filtr_adc[i];} 
 	adc_filtr =  adc_filtr / 10;             
     caunt_filtr ++;
     if (caunt_filtr == 10 )  caunt_filtr = 0; 
-    if (adc_filtr > 640 && boolean.start_delay) { boolean.err_adc = false;}  // если больше 640 то все ок
-    if (adc_filtr <= 630 && boolean.start_delay) { boolean.err_adc = !boolean.err_adc; error_buzzer(boolean.err_adc);  } // меньше 630 уже разряд
-    #ifndef DEBUG_MOD                                                                                                    // в дебаге не выключать прибор
-    if (adc_filtr < 580 && filtr_adc[9] !=0 ) { while(1) {sprintf(send_buf, " -OFF-" ); _delay_ms(500); LMOFF; TENZO_OFF;}}  // меньше 580 выключить нафиг
+    if (adc_filtr > 640 && boolean.start_delay) { boolean.err_adc = false;}  // РµСЃР»Рё Р±РѕР»СЊС€Рµ 640 С‚Рѕ РІСЃРµ РѕРє
+    if (adc_filtr <= 630 && boolean.start_delay) { boolean.err_adc = !boolean.err_adc; error_buzzer(boolean.err_adc);  } // РјРµРЅСЊС€Рµ 630 СѓР¶Рµ СЂР°Р·СЂСЏРґ
+    #ifndef DEBUG_MOD                                                                                                    // РІ РґРµР±Р°РіРµ РЅРµ РІС‹РєР»СЋС‡Р°С‚СЊ РїСЂРёР±РѕСЂ
+    if (adc_filtr < 580 && filtr_adc[9] !=0 ) { while(1) {sprintf(send_buf, " -OFF-" ); _delay_ms(500); LMOFF; TENZO_OFF;}}  // РјРµРЅСЊС€Рµ 580 РІС‹РєР»СЋС‡РёС‚СЊ РЅР°С„РёРі
     #endif     
     }             
 }
 
-void err_and_led (void)      // отслеживаем ошибки и если они есть гасим светики и бузер
+void err_and_led (void)      // РѕС‚СЃР»РµР¶РёРІР°РµРј РѕС€РёР±РєРё Рё РµСЃР»Рё РѕРЅРё РµСЃС‚СЊ РіР°СЃРёРј СЃРІРµС‚РёРєРё Рё Р±СѓР·РµСЂ
 {
      if (boolean.errors || boolean.npv || boolean.main_menu_bool || param.err36 || boolean.err_adc) {if(!boolean.led_in_menu ) {led_led();}} 
      if (!boolean.npv && !boolean.err_adc ) {error_buzzer(false);}    
 }
 
-void filtr_massa (uint8_t power)     // объеденил фильтр и дискрет так как вызываем только тогда когда данные приняты
+void filtr_massa (uint8_t power)     // РѕР±СЉРµРґРµРЅРёР» С„РёР»СЊС‚СЂ Рё РґРёСЃРєСЂРµС‚ С‚Р°Рє РєР°Рє РІС‹Р·С‹РІР°РµРј С‚РѕР»СЊРєРѕ С‚РѕРіРґР° РєРѕРіРґР° РґР°РЅРЅС‹Рµ РїСЂРёРЅСЏС‚С‹
 {
      static uint8_t namber_diskret;
      static uint8_t caunter_filtr;
      static int32_t filtr_32b [50]; 
      
           
-                 // преобразуем код в массу  
-     if (boolean.data_ok)  {                            //когда данные приняли 
-          boolean.data_ok = false;                      // сбросим флаг
+                 // РїСЂРµРѕР±СЂР°Р·СѓРµРј РєРѕРґ РІ РјР°СЃСЃСѓ  
+     if (boolean.data_ok)  {                            //РєРѕРіРґР° РґР°РЅРЅС‹Рµ РїСЂРёРЅСЏР»Рё 
+          boolean.data_ok = false;                      // СЃР±СЂРѕСЃРёРј С„Р»Р°Рі
           converting_cod_to_massa ();
-          massa = ((massa * param.calib_koef)+0.5);     // получаем реальную массу 
-          filtr_32b [caunter_filtr] = massa;      // заносим показания в фильтр
+          massa = ((massa * param.calib_koef)+0.5);     // РїРѕР»СѓС‡Р°РµРј СЂРµР°Р»СЊРЅСѓСЋ РјР°СЃСЃСѓ 
+          filtr_32b [caunter_filtr] = massa;      // Р·Р°РЅРѕСЃРёРј РїРѕРєР°Р·Р°РЅРёСЏ РІ С„РёР»СЊС‚СЂ
           
-          caunter_filtr ++;                       // перемещаемся по массиву фильтра
-          if (caunter_filtr  >= (power )) { caunter_filtr = 0;  }        // больше или равно потому что при смене размера фильтра все ложиться
-          massa_after_filtr = 0;                  // обнуляем чтоб не было лагов 
-          for (int i = 0; i < (power ); i ++)  // суммируем все элементы массива и делим на количество элементов
+          caunter_filtr ++;                       // РїРµСЂРµРјРµС‰Р°РµРјСЃСЏ РїРѕ РјР°СЃСЃРёРІСѓ С„РёР»СЊС‚СЂР°
+          if (caunter_filtr  >= (power )) { caunter_filtr = 0;  }        // Р±РѕР»СЊС€Рµ РёР»Рё СЂР°РІРЅРѕ РїРѕС‚РѕРјСѓ С‡С‚Рѕ РїСЂРё СЃРјРµРЅРµ СЂР°Р·РјРµСЂР° С„РёР»СЊС‚СЂР° РІСЃРµ Р»РѕР¶РёС‚СЊСЃСЏ
+          massa_after_filtr = 0;                  // РѕР±РЅСѓР»СЏРµРј С‡С‚РѕР± РЅРµ Р±С‹Р»Рѕ Р»Р°РіРѕРІ 
+          for (int i = 0; i < (power ); i ++)  // СЃСѓРјРјРёСЂСѓРµРј РІСЃРµ СЌР»РµРјРµРЅС‚С‹ РјР°СЃСЃРёРІР° Рё РґРµР»РёРј РЅР° РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ
           {
                massa_after_filtr += filtr_32b[i];
           }
           massa_after_filtr = massa_after_filtr / (power );
-          if (boolean.tara_ok) { massa_after_filtr = massa_after_filtr - metrology.tara; send_point (1); }    else { send_non_point(1); metrology.tara = 0;}  // если включена тара то отнимать ее вес от текущего значения, если нет то ноль + светик
-          if (param.sill1 == 0 && param.sill2 == 0 ){ massa_after_filtr = diskret(massa_after_filtr,param.discret1); namber_diskret = 1;}        // если первый и второй порог = 0 то показываем первый дискрет
-          if (massa_after_filtr < param.sill1 && param.sill1 != 0){ massa_after_filtr = diskret(massa_after_filtr,param.discret1); namber_diskret = 1; }     // если масса меньше чем первый порог и он не равен 0 то снова первый дискрет
-          if (massa_after_filtr > param.sill1 && param.sill2 == 0){ massa_after_filtr = diskret(massa_after_filtr,param.discret2); namber_diskret = 2; }     // если масса больше чем первый порог а второй равен 0 то показываем второй дискрет
-          if (massa_after_filtr > param.sill1 && massa_after_filtr < param.sill2 && param.sill2 != 0) {massa_after_filtr = diskret(massa_after_filtr,param.discret2); namber_diskret = 2; }  // если масса больше первого порога и меньше второго и второй порог не 0 показываем 2 дискрет
-          if (massa_after_filtr > param.sill2 && param.sill2 != 0){ massa_after_filtr = diskret(massa_after_filtr,param.discret3); namber_diskret = 3;  }    // если масса больше второго порога и он не 0 то показываем третий дискрет
+          if (boolean.tara_ok) { massa_after_filtr = massa_after_filtr - metrology.tara; send_point (1); }    else { send_non_point(1); metrology.tara = 0;}  // РµСЃР»Рё РІРєР»СЋС‡РµРЅР° С‚Р°СЂР° С‚Рѕ РѕС‚РЅРёРјР°С‚СЊ РµРµ РІРµСЃ РѕС‚ С‚РµРєСѓС‰РµРіРѕ Р·РЅР°С‡РµРЅРёСЏ, РµСЃР»Рё РЅРµС‚ С‚Рѕ РЅРѕР»СЊ + СЃРІРµС‚РёРє
+          if (param.sill1 == 0 && param.sill2 == 0 ){ massa_after_filtr = diskret(massa_after_filtr,param.discret1); namber_diskret = 1;}        // РµСЃР»Рё РїРµСЂРІС‹Р№ Рё РІС‚РѕСЂРѕР№ РїРѕСЂРѕРі = 0 С‚Рѕ РїРѕРєР°Р·С‹РІР°РµРј РїРµСЂРІС‹Р№ РґРёСЃРєСЂРµС‚
+          if (massa_after_filtr < param.sill1 && param.sill1 != 0){ massa_after_filtr = diskret(massa_after_filtr,param.discret1); namber_diskret = 1; }     // РµСЃР»Рё РјР°СЃСЃР° РјРµРЅСЊС€Рµ С‡РµРј РїРµСЂРІС‹Р№ РїРѕСЂРѕРі Рё РѕРЅ РЅРµ СЂР°РІРµРЅ 0 С‚Рѕ СЃРЅРѕРІР° РїРµСЂРІС‹Р№ РґРёСЃРєСЂРµС‚
+          if (massa_after_filtr > param.sill1 && param.sill2 == 0){ massa_after_filtr = diskret(massa_after_filtr,param.discret2); namber_diskret = 2; }     // РµСЃР»Рё РјР°СЃСЃР° Р±РѕР»СЊС€Рµ С‡РµРј РїРµСЂРІС‹Р№ РїРѕСЂРѕРі Р° РІС‚РѕСЂРѕР№ СЂР°РІРµРЅ 0 С‚Рѕ РїРѕРєР°Р·С‹РІР°РµРј РІС‚РѕСЂРѕР№ РґРёСЃРєСЂРµС‚
+          if (massa_after_filtr > param.sill1 && massa_after_filtr < param.sill2 && param.sill2 != 0) {massa_after_filtr = diskret(massa_after_filtr,param.discret2); namber_diskret = 2; }  // РµСЃР»Рё РјР°СЃСЃР° Р±РѕР»СЊС€Рµ РїРµСЂРІРѕРіРѕ РїРѕСЂРѕРіР° Рё РјРµРЅСЊС€Рµ РІС‚РѕСЂРѕРіРѕ Рё РІС‚РѕСЂРѕР№ РїРѕСЂРѕРі РЅРµ 0 РїРѕРєР°Р·С‹РІР°РµРј 2 РґРёСЃРєСЂРµС‚
+          if (massa_after_filtr > param.sill2 && param.sill2 != 0){ massa_after_filtr = diskret(massa_after_filtr,param.discret3); namber_diskret = 3;  }    // РµСЃР»Рё РјР°СЃСЃР° Р±РѕР»СЊС€Рµ РІС‚РѕСЂРѕРіРѕ РїРѕСЂРѕРіР° Рё РѕРЅ РЅРµ 0 С‚Рѕ РїРѕРєР°Р·С‹РІР°РµРј С‚СЂРµС‚РёР№ РґРёСЃРєСЂРµС‚
 
           switch (namber_diskret)
           {
-               case 1: if(((param.discret1 * 9) + param.NPV )< massa_after_filtr + metrology.tara) { boolean.npv = true;} else {boolean.npv = false;} // показать превышение НПВ labs??
+               case 1: if(((param.discret1 * 9) + param.NPV )< massa_after_filtr + metrology.tara) { boolean.npv = true;} else {boolean.npv = false;} // РїРѕРєР°Р·Р°С‚СЊ РїСЂРµРІС‹С€РµРЅРёРµ РќРџР’ labs??
                if (tim_5 == 0 && !boolean.errors) { if (massa_after_filtr < last_massa + param.discret1 *2  && massa_after_filtr > last_massa - param.discret1 *2 ) \
                {send_point(3);boolean.stab = true;}  else {send_non_point(3);boolean.stab = false;}  tim_5 = (param.tim_stab * 1000); last_massa = massa_after_filtr;}  break;   
                        
@@ -153,13 +153,13 @@ void filtr_massa (uint8_t power)     // объеденил фильтр и дискрет так как вызыв
                case 3: if(((param.discret3 * 9) + param.NPV )< massa_after_filtr + metrology.tara) { boolean.npv = true;} else {boolean.npv = false;} 
                if (tim_5 == 0 && !boolean.errors) { if (massa_after_filtr < last_massa + param.discret3 *2  && massa_after_filtr > last_massa - param.discret3 *2 ) \
                {send_point(3);boolean.stab = true;}  else {send_non_point(3);boolean.stab = false;}  tim_5 = (param.tim_stab * 1000); last_massa = massa_after_filtr;}  break;
-               // это строчки стабилизации. если предыдущий вес в пределах одного дискрета в обе стороны то вес стабилен.      
+               // СЌС‚Рѕ СЃС‚СЂРѕС‡РєРё СЃС‚Р°Р±РёР»РёР·Р°С†РёРё. РµСЃР»Рё РїСЂРµРґС‹РґСѓС‰РёР№ РІРµСЃ РІ РїСЂРµРґРµР»Р°С… РѕРґРЅРѕРіРѕ РґРёСЃРєСЂРµС‚Р° РІ РѕР±Рµ СЃС‚РѕСЂРѕРЅС‹ С‚Рѕ РІРµСЃ СЃС‚Р°Р±РёР»РµРЅ.      
           }
      }
  
-     if (boolean.npv && !boolean.errors) {strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[ERROR1]))); error_buzzer(true); }  // если у нас превышение НПВ показать ерор, пикать, погасить лампы
-     (massa_after_filtr == 0 && !boolean.errors ) ?   send_point (2) : send_non_point(2);   // если масса равна 0 то зажечь светик
-     if (!boolean.errors && !boolean.npv && boolean.start_delay) {sprintf(send_buf, "%6ld" , massa_after_filtr ); eror_sens_up = 0; } // если нет ошибок показать массу, перекинуть счетчик в 0
+     if (boolean.npv && !boolean.errors) {strcpy_P(send_buf, (PGM_P)pgm_read_word(&(error_string[ERROR1]))); error_buzzer(true); }  // РµСЃР»Рё Сѓ РЅР°СЃ РїСЂРµРІС‹С€РµРЅРёРµ РќРџР’ РїРѕРєР°Р·Р°С‚СЊ РµСЂРѕСЂ, РїРёРєР°С‚СЊ, РїРѕРіР°СЃРёС‚СЊ Р»Р°РјРїС‹
+     (massa_after_filtr == 0 && !boolean.errors ) ?   send_point (2) : send_non_point(2);   // РµСЃР»Рё РјР°СЃСЃР° СЂР°РІРЅР° 0 С‚Рѕ Р·Р°Р¶РµС‡СЊ СЃРІРµС‚РёРє
+     if (!boolean.errors && !boolean.npv && boolean.start_delay) {sprintf(send_buf, "%6ld" , massa_after_filtr ); eror_sens_up = 0; } // РµСЃР»Рё РЅРµС‚ РѕС€РёР±РѕРє РїРѕРєР°Р·Р°С‚СЊ РјР°СЃСЃСѓ, РїРµСЂРµРєРёРЅСѓС‚СЊ СЃС‡РµС‚С‡РёРє РІ 0
      if(boolean.errors && boolean.start_delay) {
           switch (eror_sens_up){
                case 0:  break;
@@ -175,7 +175,7 @@ void filtr_massa (uint8_t power)     // объеденил фильтр и дискрет так как вызыв
                case 10: if (eror_sens_up <= param.sensor_number  && sens_cod_led & 0x200)  {tim_6 = 0;} else { strcpy_P(send_buf, (PGM_P)pgm_read_word(&(er_sens[9])));  }    break; 
                case 11: if (eror_sens_up <= param.sensor_number  && sens_cod_led & 0x400)  {tim_6 = 0;} else { strcpy_P(send_buf, (PGM_P)pgm_read_word(&(er_sens[10])));  }   break;
                case 12: if (eror_sens_up <= param.sensor_number  && sens_cod_led & 0x800)  {tim_6 = 0;} else { strcpy_P(send_buf, (PGM_P)pgm_read_word(&(er_sens[11])));  }   break; 
-               // вот такой тупой показ ероров датчиков, если код датчика совпадает с номером кейса то показываем оошибку, если не совпадает прыгаем в другой кейс.(через тим6)                                                                               
+               // РІРѕС‚ С‚Р°РєРѕР№ С‚СѓРїРѕР№ РїРѕРєР°Р· РµСЂРѕСЂРѕРІ РґР°С‚С‡РёРєРѕРІ, РµСЃР»Рё РєРѕРґ РґР°С‚С‡РёРєР° СЃРѕРІРїР°РґР°РµС‚ СЃ РЅРѕРјРµСЂРѕРј РєРµР№СЃР° С‚Рѕ РїРѕРєР°Р·С‹РІР°РµРј РѕРѕС€РёР±РєСѓ, РµСЃР»Рё РЅРµ СЃРѕРІРїР°РґР°РµС‚ РїСЂС‹РіР°РµРј РІ РґСЂСѓРіРѕР№ РєРµР№СЃ.(С‡РµСЂРµР· С‚РёРј6)                                                                               
           }
           if (!tim_6) {tim_6 = 5000; if (eror_sens_up < param.sensor_number) {eror_sens_up ++; } else {eror_sens_up = 1; } buzers (1000);}
      }
@@ -183,7 +183,7 @@ void filtr_massa (uint8_t power)     // объеденил фильтр и дискрет так как вызыв
 
 void converting_cod_to_massa (void)
 {
-     while (1)  //логика следующая, попадаем в вайл, и летим по нему пока не встретим бряк, а он зависит от того сколько выбрано датчиков
+     while (1)  //Р»РѕРіРёРєР° СЃР»РµРґСѓСЋС‰Р°СЏ, РїРѕРїР°РґР°РµРј РІ РІР°Р№Р», Рё Р»РµС‚РёРј РїРѕ РЅРµРјСѓ РїРѕРєР° РЅРµ РІСЃС‚СЂРµС‚РёРј Р±СЂСЏРє, Р° РѕРЅ Р·Р°РІРёСЃРёС‚ РѕС‚ С‚РѕРіРѕ СЃРєРѕР»СЊРєРѕ РІС‹Р±СЂР°РЅРѕ РґР°С‚С‡РёРєРѕРІ
      {
           filtr.sens1 = (((metrology.cod_sensor1 - metrology.cod_zero_sensor1) * metrology.koef_sensor1) + 0.5);
           filtr.sens2 = (((metrology.cod_sensor2 - metrology.cod_zero_sensor2) * metrology.koef_sensor2) + 0.5);
@@ -212,7 +212,7 @@ void converting_cod_to_massa (void)
      }
 }
 
-void zero_funk (uint8_t eprom_ok)                      // функция обнуления. если ей передать 0 то будет просто обнуление, а если 1 то еще и запись в еепром
+void zero_funk (uint8_t eprom_ok)                      // С„СѓРЅРєС†РёСЏ РѕР±РЅСѓР»РµРЅРёСЏ. РµСЃР»Рё РµР№ РїРµСЂРµРґР°С‚СЊ 0 С‚Рѕ Р±СѓРґРµС‚ РїСЂРѕСЃС‚Рѕ РѕР±РЅСѓР»РµРЅРёРµ, Р° РµСЃР»Рё 1 С‚Рѕ РµС‰Рµ Рё Р·Р°РїРёСЃСЊ РІ РµРµРїСЂРѕРј
 {
      metrology.cod_zero_sensor1  = metrology.cod_sensor1;
      metrology.cod_zero_sensor2  = metrology.cod_sensor2;
@@ -242,14 +242,14 @@ void zero_funk (uint8_t eprom_ok)                      // функция обнуления. есл
      }
 }
 
-void no_pay_wizard (void)        // проверка на срабатывание ерр36 
+void no_pay_wizard (void)        // РїСЂРѕРІРµСЂРєР° РЅР° СЃСЂР°Р±Р°С‚С‹РІР°РЅРёРµ РµСЂСЂ36 
 {
-     if (param.year_err <= DS.year){ if (param.mount_err <= DS.month){if (param.data_err <= DS.date){   // если дата совпадает или уже меньше то включить ерр36
-          if(param.err36 == 0) { param.err36 = 1; EEPROM_write(EE_ERRPR36, param.err36);}              // записать один раз и больше не заходить, чтоб не убивать еепром 
+     if (param.year_err <= DS.year){ if (param.mount_err <= DS.month){if (param.data_err <= DS.date){   // РµСЃР»Рё РґР°С‚Р° СЃРѕРІРїР°РґР°РµС‚ РёР»Рё СѓР¶Рµ РјРµРЅСЊС€Рµ С‚Рѕ РІРєР»СЋС‡РёС‚СЊ РµСЂСЂ36
+          if(param.err36 == 0) { param.err36 = 1; EEPROM_write(EE_ERRPR36, param.err36);}              // Р·Р°РїРёСЃР°С‚СЊ РѕРґРёРЅ СЂР°Р· Рё Р±РѕР»СЊС€Рµ РЅРµ Р·Р°С…РѕРґРёС‚СЊ, С‡С‚РѕР± РЅРµ СѓР±РёРІР°С‚СЊ РµРµРїСЂРѕРј 
            }}}
 }
 
-uint32_t diskret (uint32_t data, uint8_t dskrt)        // функция дискрета, взята с впшки
+uint32_t diskret (uint32_t data, uint8_t dskrt)        // С„СѓРЅРєС†РёСЏ РґРёСЃРєСЂРµС‚Р°, РІР·СЏС‚Р° СЃ РІРїС€РєРё
 {
      static uint32_t temp;
      if (dskrt == 1) return (data);
@@ -258,10 +258,10 @@ uint32_t diskret (uint32_t data, uint8_t dskrt)        // функция дискрета, взят
      return (temp);
 }
 
-void TABLO_print(int32_t ves)                          // передача в токовую петлю. тоже украдено
+void TABLO_print(int32_t ves)                          // РїРµСЂРµРґР°С‡Р° РІ С‚РѕРєРѕРІСѓСЋ РїРµС‚Р»СЋ. С‚РѕР¶Рµ СѓРєСЂР°РґРµРЅРѕ
 {
      char buf_tablo[4];
-     uint32_t abs_ves = labs(ves);                     // это взять число по модулю:)
+     uint32_t abs_ves = labs(ves);                     // СЌС‚Рѕ РІР·СЏС‚СЊ С‡РёСЃР»Рѕ РїРѕ РјРѕРґСѓР»СЋ:)
      buf_tablo[0] = (ves >= 0) ? 0 : 0x08;
      buf_tablo[0] |= ((abs_ves & 0x00010000) == 0x00010000) ? 0x40 : 0;
      buf_tablo[0] |= ((abs_ves & 0x00020000) == 0x00020000) ? 0x80 : 0;
@@ -271,144 +271,144 @@ void TABLO_print(int32_t ves)                          // передача в токовую пет
      uart3_send_string(buf_tablo);
 }
 
-void init_atmega (void)      // инициализация портов, переферии
+void init_atmega (void)      // РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРѕСЂС‚РѕРІ, РїРµСЂРµС„РµСЂРёРё
 {
-     DDRB = 0x8F;            // Ножки SPI на выход + светик на выход
-     PORTB = 0x05;           // низкий уровень
+     DDRB = 0x8F;            // РќРѕР¶РєРё SPI РЅР° РІС‹С…РѕРґ + СЃРІРµС‚РёРє РЅР° РІС‹С…РѕРґ
+     PORTB = 0x05;           // РЅРёР·РєРёР№ СѓСЂРѕРІРµРЅСЊ
      
-     DDRD = 0x10;            // пин бузера
+     DDRD = 0x10;            // РїРёРЅ Р±СѓР·РµСЂР°
      PORTD = 0x00;
      
-     DDRJ = 0x20;            // пин включения питания и пин отслеживания нажатой кнопки питания
+     DDRJ = 0x20;            // РїРёРЅ РІРєР»СЋС‡РµРЅРёСЏ РїРёС‚Р°РЅРёСЏ Рё РїРёРЅ РѕС‚СЃР»РµР¶РёРІР°РЅРёСЏ РЅР°Р¶Р°С‚РѕР№ РєРЅРѕРїРєРё РїРёС‚Р°РЅРёСЏ
      PORTJ = 0x00;
      
-     DDRG = 0x20;            // пин включения 12 вольт на датчики
+     DDRG = 0x20;            // РїРёРЅ РІРєР»СЋС‡РµРЅРёСЏ 12 РІРѕР»СЊС‚ РЅР° РґР°С‚С‡РёРєРё
      PORTG = 0x00;
      
-     DDRL = 0x00;            // пины кнопок на вход
-     PORTL = 0x3F;           // подтяжка к плюсу, пока внутрення
+     DDRL = 0x00;            // РїРёРЅС‹ РєРЅРѕРїРѕРє РЅР° РІС…РѕРґ
+     PORTL = 0x3F;           // РїРѕРґС‚СЏР¶РєР° Рє РїР»СЋСЃСѓ, РїРѕРєР° РІРЅСѓС‚СЂРµРЅРЅСЏ
      
-     SPCR = ((1<<SPE)|(1<<MSTR)|(1<<SPR0) );  //Включим шину SPI, объявим ведущим, делитель на 16
-     SPCR |= 0x80;           // включим прерывание
-     SSON;                   // поднимем чип селект
+     SPCR = ((1<<SPE)|(1<<MSTR)|(1<<SPR0) );  //Р’РєР»СЋС‡РёРј С€РёРЅСѓ SPI, РѕР±СЉСЏРІРёРј РІРµРґСѓС‰РёРј, РґРµР»РёС‚РµР»СЊ РЅР° 16
+     SPCR |= 0x80;           // РІРєР»СЋС‡РёРј РїСЂРµСЂС‹РІР°РЅРёРµ
+     SSON;                   // РїРѕРґРЅРёРјРµРј С‡РёРї СЃРµР»РµРєС‚
      
-     ADMUX = 0x40;           // внешний источник опорного и нулевой канал  0x40
-     ADCSRA = 0xEF;          // включить ацп, старт, старт по триггеру , делитель скорости преобразования на 32
-     DIDR0 = 0x01;           // отключить канал 0 от регистра ддр
+     ADMUX = 0x40;           // РІРЅРµС€РЅРёР№ РёСЃС‚РѕС‡РЅРёРє РѕРїРѕСЂРЅРѕРіРѕ Рё РЅСѓР»РµРІРѕР№ РєР°РЅР°Р»  0x40
+     ADCSRA = 0xEF;          // РІРєР»СЋС‡РёС‚СЊ Р°С†Рї, СЃС‚Р°СЂС‚, СЃС‚Р°СЂС‚ РїРѕ С‚СЂРёРіРіРµСЂСѓ , РґРµР»РёС‚РµР»СЊ СЃРєРѕСЂРѕСЃС‚Рё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ РЅР° 32
+     DIDR0 = 0x01;           // РѕС‚РєР»СЋС‡РёС‚СЊ РєР°РЅР°Р» 0 РѕС‚ СЂРµРіРёСЃС‚СЂР° РґРґСЂ
      
-     TCCR0B = 0x01;          // делитель 0 на таймер 0       62 KГерц
-     TIMSK0 = 0x01;          // включить прерывания по переполнению
+     TCCR0B = 0x01;          // РґРµР»РёС‚РµР»СЊ 0 РЅР° С‚Р°Р№РјРµСЂ 0       62 KР“РµСЂС†
+     TIMSK0 = 0x01;          // РІРєР»СЋС‡РёС‚СЊ РїСЂРµСЂС‹РІР°РЅРёСЏ РїРѕ РїРµСЂРµРїРѕР»РЅРµРЅРёСЋ
      
-     TCCR1B = 0x01;          // делитель 0 на таймер 1  + TCNT1 = 0xE800 это дает частоту 2,6 КГц
-     TIMSK1 = 0x01;          // включить прерывания по переполнению
+     TCCR1B = 0x01;          // РґРµР»РёС‚РµР»СЊ 0 РЅР° С‚Р°Р№РјРµСЂ 1  + TCNT1 = 0xE800 СЌС‚Рѕ РґР°РµС‚ С‡Р°СЃС‚РѕС‚Сѓ 2,6 РљР“С†
+     TIMSK1 = 0x01;          // РІРєР»СЋС‡РёС‚СЊ РїСЂРµСЂС‹РІР°РЅРёСЏ РїРѕ РїРµСЂРµРїРѕР»РЅРµРЅРёСЋ
      
-     // TCCR2B = 0x02;          // делитель на 8 и того частота 8 КГерц
-     //	TIMSK1 = 0x01;          // включить прерывания по переполнению
+     // TCCR2B = 0x02;          // РґРµР»РёС‚РµР»СЊ РЅР° 8 Рё С‚РѕРіРѕ С‡Р°СЃС‚РѕС‚Р° 8 РљР“РµСЂС†
+     //	TIMSK1 = 0x01;          // РІРєР»СЋС‡РёС‚СЊ РїСЂРµСЂС‹РІР°РЅРёСЏ РїРѕ РїРµСЂРµРїРѕР»РЅРµРЅРёСЋ
      
      
      init_UART_tenzo();
      init_UART_tablo();
      init_Uart_0_1_start();
-     LEDON;                  // пока нету пина блокировки
-     #ifdef DEBUG_MOD        // чтоб в отладке не вводить постоянно пароли конченые
+     LEDON;                  // РїРѕРєР° РЅРµС‚Сѓ РїРёРЅР° Р±Р»РѕРєРёСЂРѕРІРєРё
+     #ifdef DEBUG_MOD        // С‡С‚РѕР± РІ РѕС‚Р»Р°РґРєРµ РЅРµ РІРІРѕРґРёС‚СЊ РїРѕСЃС‚РѕСЏРЅРЅРѕ РїР°СЂРѕР»Рё РєРѕРЅС‡РµРЅС‹Рµ
      LMON;
      TENZO_ON;
      #endif
 }
 
-void start (void)                            // функция включения прибора
+void start (void)                            // С„СѓРЅРєС†РёСЏ РІРєР»СЋС‡РµРЅРёСЏ РїСЂРёР±РѕСЂР°
 {
-     static uint16_t on_on = 0;                    // создаем переменную счетчик
-     while (on_on != TIM_ON){                      // ждем пока переменная не достигнет значения указаного в дефайне
-          if (PIN_OFF)  {                          // если кнопка нажата
-               if (on_on < TIM_ON) on_on ++;       // увеличиваем переменную
+     static uint16_t on_on = 0;                    // СЃРѕР·РґР°РµРј РїРµСЂРµРјРµРЅРЅСѓСЋ СЃС‡РµС‚С‡РёРє
+     while (on_on != TIM_ON){                      // Р¶РґРµРј РїРѕРєР° РїРµСЂРµРјРµРЅРЅР°СЏ РЅРµ РґРѕСЃС‚РёРіРЅРµС‚ Р·РЅР°С‡РµРЅРёСЏ СѓРєР°Р·Р°РЅРѕРіРѕ РІ РґРµС„Р°Р№РЅРµ
+          if (PIN_OFF)  {                          // РµСЃР»Рё РєРЅРѕРїРєР° РЅР°Р¶Р°С‚Р°
+               if (on_on < TIM_ON) on_on ++;       // СѓРІРµР»РёС‡РёРІР°РµРј РїРµСЂРµРјРµРЅРЅСѓСЋ
                _delay_ms(1);
           }
-          else on_on = 0;                          // отпустили, сбросили в ноль
+          else on_on = 0;                          // РѕС‚РїСѓСЃС‚РёР»Рё, СЃР±СЂРѕСЃРёР»Рё РІ РЅРѕР»СЊ
      }
-     LMON;                                         // включили датчики и прибор
+     LMON;                                         // РІРєР»СЋС‡РёР»Рё РґР°С‚С‡РёРєРё Рё РїСЂРёР±РѕСЂ
      TENZO_ON;
 }
 
-void zastavka (void)                         // печатаем как в диниках 888888 при старте
+void zastavka (void)                         // РїРµС‡Р°С‚Р°РµРј РєР°Рє РІ РґРёРЅРёРєР°С… 888888 РїСЂРё СЃС‚Р°СЂС‚Рµ
 {
 
-//      indication ();                           // показываем пустой экран
-     for (int t = 0; t < 7; t++){             // в цикле начинаем записывать 8 только в другом представлении, без преобразования через таблицу
+//      indication ();                           // РїРѕРєР°Р·С‹РІР°РµРј РїСѓСЃС‚РѕР№ СЌРєСЂР°РЅ
+     for (int t = 0; t < 7; t++){             // РІ С†РёРєР»Рµ РЅР°С‡РёРЅР°РµРј Р·Р°РїРёСЃС‹РІР°С‚СЊ 8 С‚РѕР»СЊРєРѕ РІ РґСЂСѓРіРѕРј РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРё, Р±РµР· РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ С‡РµСЂРµР· С‚Р°Р±Р»РёС†Сѓ
           send_buf [t] = 0x7F;
-          BZRON;                               // пикаем
-          _delay_ms(50);                      // ждем
+          BZRON;                               // РїРёРєР°РµРј
+          _delay_ms(50);                      // Р¶РґРµРј
           BZROFF;
-          indication ();                       // показываем
-          _delay_ms(50);                      // ждем
+          indication ();                       // РїРѕРєР°Р·С‹РІР°РµРј
+          _delay_ms(50);                      // Р¶РґРµРј
      }
      _delay_ms(500);
-      for (int t = 0; t < 6; t++){             // сначала забиваем нулями ?? нужно ли это хз
+      for (int t = 0; t < 6; t++){             // СЃРЅР°С‡Р°Р»Р° Р·Р°Р±РёРІР°РµРј РЅСѓР»СЏРјРё ?? РЅСѓР¶РЅРѕ Р»Рё СЌС‚Рѕ С…Р·
            send_buf [t] = 0x00;
       }     
 }
 
-void off_key (void)                          // отслеживание кнопки выключения
+void off_key (void)                          // РѕС‚СЃР»РµР¶РёРІР°РЅРёРµ РєРЅРѕРїРєРё РІС‹РєР»СЋС‡РµРЅРёСЏ
 {
-     static uint8_t on_of = 0;                       // создаем новыую переменную счетчика
-     if (PIN_OFF_OF && !boolean.non_on) {boolean.non_on = true;}     // это защита чтоб прибор не начал выключатся пока не отпустишь кнопку включения после включения
-     if (PIN_OFF && boolean.non_on)  {                               // дальше все по класике отслеживаем нажатие, считаем переменную
+     static uint8_t on_of = 0;                       // СЃРѕР·РґР°РµРј РЅРѕРІС‹СѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ СЃС‡РµС‚С‡РёРєР°
+     if (PIN_OFF_OF && !boolean.non_on) {boolean.non_on = true;}     // СЌС‚Рѕ Р·Р°С‰РёС‚Р° С‡С‚РѕР± РїСЂРёР±РѕСЂ РЅРµ РЅР°С‡Р°Р» РІС‹РєР»СЋС‡Р°С‚СЃСЏ РїРѕРєР° РЅРµ РѕС‚РїСѓСЃС‚РёС€СЊ РєРЅРѕРїРєСѓ РІРєР»СЋС‡РµРЅРёСЏ РїРѕСЃР»Рµ РІРєР»СЋС‡РµРЅРёСЏ
+     if (PIN_OFF && boolean.non_on)  {                               // РґР°Р»СЊС€Рµ РІСЃРµ РїРѕ РєР»Р°СЃРёРєРµ РѕС‚СЃР»РµР¶РёРІР°РµРј РЅР°Р¶Р°С‚РёРµ, СЃС‡РёС‚Р°РµРј РїРµСЂРµРјРµРЅРЅСѓСЋ
           if (on_of < TIM_OFF) on_of ++;
-          if (on_of == 1) buzers (10000);             // пикаем
+          if (on_of == 1) buzers (10000);             // РїРёРєР°РµРј
      }
-     else on_of = 0;                                 // если отпустили сбросили в ноль
-     if (on_of >= TIM_OFF ){                         // если достигли величины дефайна на отключение
-          sprintf(send_buf, " -OFF-" );               // печатаем офф
+     else on_of = 0;                                 // РµСЃР»Рё РѕС‚РїСѓСЃС‚РёР»Рё СЃР±СЂРѕСЃРёР»Рё РІ РЅРѕР»СЊ
+     if (on_of >= TIM_OFF ){                         // РµСЃР»Рё РґРѕСЃС‚РёРіР»Рё РІРµР»РёС‡РёРЅС‹ РґРµС„Р°Р№РЅР° РЅР° РѕС‚РєР»СЋС‡РµРЅРёРµ
+          sprintf(send_buf, " -OFF-" );               // РїРµС‡Р°С‚Р°РµРј РѕС„С„
           buzers (10000);
           LMOFF;
           TENZO_OFF;
           while (1){
-               sprintf(send_buf, " -OFF-" );           // печатаем офф и висим тут пока не погаснет экран
+               sprintf(send_buf, " -OFF-" );           // РїРµС‡Р°С‚Р°РµРј РѕС„С„ Рё РІРёСЃРёРј С‚СѓС‚ РїРѕРєР° РЅРµ РїРѕРіР°СЃРЅРµС‚ СЌРєСЂР°РЅ
           }
      }
 }
 
-void enter_password_init (void)              // функция инициализации при вводе пароля
+void enter_password_init (void)              // С„СѓРЅРєС†РёСЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РїСЂРё РІРІРѕРґРµ РїР°СЂРѕР»СЏ
 {
      if (INIT_KEY  )
      {
           
           static uint32_t mirror_data;
-          static uint8_t  caunter_input;               // создаем счетчик
-          static char itedger [10] ;                   // создаем буффер
+          static uint8_t  caunter_input;               // СЃРѕР·РґР°РµРј СЃС‡РµС‚С‡РёРє
+          static char itedger [10] ;                   // СЃРѕР·РґР°РµРј Р±СѓС„С„РµСЂ
           caunter_input = 2;
           sprintf(itedger, "%06lu"  ,(uint32_t) mirror_data );
-          while (1){                                                                                                                // то количество сколько символов передали
-               if (button_press (KEY_RIGHT)) { if (caunter_input < 5  ) caunter_input ++; }                                         // кнопка в право, сместить указатель
-               if (button_press (KEY_LEFT))  {if (caunter_input > 2)     caunter_input --;}                                         // аналогично сместить в другую сторону если можна
+          while (1){                                                                                                                // С‚Рѕ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРєРѕР»СЊРєРѕ СЃРёРјРІРѕР»РѕРІ РїРµСЂРµРґР°Р»Рё
+               if (button_press (KEY_RIGHT)) { if (caunter_input < 5  ) caunter_input ++; }                                         // РєРЅРѕРїРєР° РІ РїСЂР°РІРѕ, СЃРјРµСЃС‚РёС‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ
+               if (button_press (KEY_LEFT))  {if (caunter_input > 2)     caunter_input --;}                                         // Р°РЅР°Р»РѕРіРёС‡РЅРѕ СЃРјРµСЃС‚РёС‚СЊ РІ РґСЂСѓРіСѓСЋ СЃС‚РѕСЂРѕРЅСѓ РµСЃР»Рё РјРѕР¶РЅР°
                if (button_press (KEY_UP)) {
-                    if (itedger[caunter_input] - '0' < 9) itedger[caunter_input]  ++;                                               // как и в функции времени проверяем какой символ у нас в элементе буфера и по возможности увеличиваем
+                    if (itedger[caunter_input] - '0' < 9) itedger[caunter_input]  ++;                                               // РєР°Рє Рё РІ С„СѓРЅРєС†РёРё РІСЂРµРјРµРЅРё РїСЂРѕРІРµСЂСЏРµРј РєР°РєРѕР№ СЃРёРјРІРѕР» Сѓ РЅР°СЃ РІ СЌР»РµРјРµРЅС‚Рµ Р±СѓС„РµСЂР° Рё РїРѕ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СѓРІРµР»РёС‡РёРІР°РµРј
                     else if(itedger[caunter_input] - '0' == 9) itedger[caunter_input] = '0';
                }
                if (button_press (KEY_DOWN)) {
                     if (itedger[caunter_input] - '0'  > 0) itedger[caunter_input]  --;
                     else if(itedger[caunter_input] - '0'  == 0) itedger[caunter_input]  = '9';
                }
-               mirror_data = atol (itedger);                                                                                      // тут сканф заменил атол и все работает так же само
+               mirror_data = atol (itedger);                                                                                      // С‚СѓС‚ СЃРєР°РЅС„ Р·Р°РјРµРЅРёР» Р°С‚РѕР» Рё РІСЃРµ СЂР°Р±РѕС‚Р°РµС‚ С‚Р°Рє Р¶Рµ СЃР°РјРѕ
                sprintf(send_buf, "  %04lu"  ,(uint32_t) mirror_data );
-               blink_simbol (caunter_input);                                                                                      // моргаем изменяемым символом
+               blink_simbol (caunter_input);                                                                                      // РјРѕСЂРіР°РµРј РёР·РјРµРЅСЏРµРјС‹Рј СЃРёРјРІРѕР»РѕРј
                if (button_press (KEY_ENTER))
                {
                     if (mirror_data == PASWORD_INIT)  {  init_EEprom (); error_func (NOERROR); break;}
                     if (mirror_data == PASWORD_ERR36) {  init_err36 (); error_func (NOERROR);  break;}
-                    if (mirror_data != PASWORD_INIT && mirror_data != PASWORD_ERR36) {error_func (ERROR5); break;}                // если пароль не соответствует то еррор
+                    if (mirror_data != PASWORD_INIT && mirror_data != PASWORD_ERR36) {error_func (ERROR5); break;}                // РµСЃР»Рё РїР°СЂРѕР»СЊ РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С‚Рѕ РµСЂСЂРѕСЂ
                }
                if (button_press (KEY_ESC)) {break;}
           }
      }
 }
 
-void init_after_EEprom (void)                // инициализация после чтения еепром
+void init_after_EEprom (void)                // РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРѕСЃР»Рµ С‡С‚РµРЅРёСЏ РµРµРїСЂРѕРј
 {
-     init_light ();                             // яркость матрицы
-     init_UART_0_1 (param.baud1, param.baud2);  // скорость юартов
-     eror_sens_up = 0;                          // переместимся на 0 кейс ошибок датчиокв
-     tim_6 = 8000;                              // задерка на показ символов
-     mein_display = 3;                          // а это чтоб не показывать при старте фигню. ерор и тд
+     init_light ();                             // СЏСЂРєРѕСЃС‚СЊ РјР°С‚СЂРёС†С‹
+     init_UART_0_1 (param.baud1, param.baud2);  // СЃРєРѕСЂРѕСЃС‚СЊ СЋР°СЂС‚РѕРІ
+     eror_sens_up = 0;                          // РїРµСЂРµРјРµСЃС‚РёРјСЃСЏ РЅР° 0 РєРµР№СЃ РѕС€РёР±РѕРє РґР°С‚С‡РёРѕРєРІ
+     tim_6 = 8000;                              // Р·Р°РґРµСЂРєР° РЅР° РїРѕРєР°Р· СЃРёРјРІРѕР»РѕРІ
+     mein_display = 3;                          // Р° СЌС‚Рѕ С‡С‚РѕР± РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ РїСЂРё СЃС‚Р°СЂС‚Рµ С„РёРіРЅСЋ. РµСЂРѕСЂ Рё С‚Рґ
 }
 
