@@ -10,80 +10,80 @@
 extern struct parametrs param;
 extern struct metrologis metrology;
 
-void EEPROM_write(uint16_t uiAddress, uint8_t ucData)      // функция записи в еепром 8 битного числа  по заданному адресу
+void EEPROM_write(uint16_t uiAddress, uint8_t ucData)      // С„СѓРЅРєС†РёСЏ Р·Р°РїРёСЃРё РІ РµРµРїСЂРѕРј 8 Р±РёС‚РЅРѕРіРѕ С‡РёСЃР»Р°  РїРѕ Р·Р°РґР°РЅРЅРѕРјСѓ Р°РґСЂРµСЃСѓ
 {
 	cli();
-	while(EECR & (1<<EEPE)){}       //ждем освобождения флага окончания последней операцией с памятью
-	EEAR = uiAddress;               //Устанавливаем адрес
-	EEDR = ucData;                  //Пищем данные в регистр
-	EECR |= (1<<EEMPE);             //Разрешаем запись
-	EECR |= (1<<EEPE);              //Пишем байт в память
+	while(EECR & (1<<EEPE)){}       //Р¶РґРµРј РѕСЃРІРѕР±РѕР¶РґРµРЅРёСЏ С„Р»Р°РіР° РѕРєРѕРЅС‡Р°РЅРёСЏ РїРѕСЃР»РµРґРЅРµР№ РѕРїРµСЂР°С†РёРµР№ СЃ РїР°РјСЏС‚СЊСЋ
+	EEAR = uiAddress;               //РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р°РґСЂРµСЃ
+	EEDR = ucData;                  //РџРёС‰РµРј РґР°РЅРЅС‹Рµ РІ СЂРµРіРёСЃС‚СЂ
+	EECR |= (1<<EEMPE);             //Р Р°Р·СЂРµС€Р°РµРј Р·Р°РїРёСЃСЊ
+	EECR |= (1<<EEPE);              //РџРёС€РµРј Р±Р°Р№С‚ РІ РїР°РјСЏС‚СЊ РїРѕ СЂСѓСЃСЃРєРё 
 	sei();
 }
 
-uint8_t EEPROM_read(uint16_t uiAddress)                     // функция чтения 8 битного числа из еепром
+uint8_t EEPROM_read(uint16_t uiAddress)                     // С„СѓРЅРєС†РёСЏ С‡С‚РµРЅРёСЏ 8 Р±РёС‚РЅРѕРіРѕ С‡РёСЃР»Р° РёР· РµРµРїСЂРѕРј
 {
 	cli();
-	while(EECR & (1<<EEPE)){}                              //ждем освобождения флага окончания последней операцией с памятью
-	EEAR = uiAddress;                                      //Устанавливаем адрес
-	EECR |= (1<<EERE);                                     //Запускаем операцию считывания из памяти в регистр данных
+	while(EECR & (1<<EEPE)){}                              //Р¶РґРµРј РѕСЃРІРѕР±РѕР¶РґРµРЅРёСЏ С„Р»Р°РіР° РѕРєРѕРЅС‡Р°РЅРёСЏ РїРѕСЃР»РµРґРЅРµР№ РѕРїРµСЂР°С†РёРµР№ СЃ РїР°РјСЏС‚СЊСЋ
+	EEAR = uiAddress;                                      //РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р°РґСЂРµСЃ
+	EECR |= (1<<EERE);                                     //Р—Р°РїСѓСЃРєР°РµРј РѕРїРµСЂР°С†РёСЋ СЃС‡РёС‚С‹РІР°РЅРёСЏ РёР· РїР°РјСЏС‚Рё РІ СЂРµРіРёСЃС‚СЂ РґР°РЅРЅС‹С…
 	sei();
-	return EEDR; //Возвращаем результат
+	return EEDR; //Р’РѕР·РІСЂР°С‰Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚
 }
 
-uint32_t EEPROM_read_32t (uint16_t uiAddress)                // функция чтения 32битного числа из еепром по заданному дресу
+uint32_t EEPROM_read_32t (uint16_t uiAddress)                // С„СѓРЅРєС†РёСЏ С‡С‚РµРЅРёСЏ 32Р±РёС‚РЅРѕРіРѕ С‡РёСЃР»Р° РёР· РµРµРїСЂРѕРј РїРѕ Р·Р°РґР°РЅРЅРѕРјСѓ РґСЂРµСЃСѓ
 {
-	static uint32_t receive_data;                            // создали переменную
-	receive_data = EEPROM_read (uiAddress+0x03);             // считали в нее старшый байт
-	receive_data = receive_data << 8;                        // сдвинули освободив место под младший
-	receive_data |= EEPROM_read (uiAddress+0x02);            // считали второй байт и присвоили без изменения других битов
-	receive_data = receive_data << 8;                        // сдвинули
+	static uint32_t receive_data;                            // СЃРѕР·РґР°Р»Рё РїРµСЂРµРјРµРЅРЅСѓСЋ
+	receive_data = EEPROM_read (uiAddress+0x03);             // СЃС‡РёС‚Р°Р»Рё РІ РЅРµРµ СЃС‚Р°СЂС€С‹Р№ Р±Р°Р№С‚
+	receive_data = receive_data << 8;                        // СЃРґРІРёРЅСѓР»Рё РѕСЃРІРѕР±РѕРґРёРІ РјРµСЃС‚Рѕ РїРѕРґ РјР»Р°РґС€РёР№
+	receive_data |= EEPROM_read (uiAddress+0x02);            // СЃС‡РёС‚Р°Р»Рё РІС‚РѕСЂРѕР№ Р±Р°Р№С‚ Рё РїСЂРёСЃРІРѕРёР»Рё Р±РµР· РёР·РјРµРЅРµРЅРёСЏ РґСЂСѓРіРёС… Р±РёС‚РѕРІ
+	receive_data = receive_data << 8;                        // СЃРґРІРёРЅСѓР»Рё
 	receive_data |= EEPROM_read (uiAddress+0x01);
 	receive_data = receive_data << 8;
 	receive_data |= EEPROM_read (uiAddress);
-	return receive_data;                                     // вернули итог
+	return receive_data;                                     // РІРµСЂРЅСѓР»Рё РёС‚РѕРі
 }
 
-void EEPROM_write_32t (uint16_t uiAddress, uint32_t ucData)   // запись 32 битного числа
+void EEPROM_write_32t (uint16_t uiAddress, uint32_t ucData)   // Р·Р°РїРёСЃСЊ 32 Р±РёС‚РЅРѕРіРѕ С‡РёСЃР»Р°
 {
-	EEPROM_write (uiAddress,ucData);                          // в обратном порядке складываем в память
+	EEPROM_write (uiAddress,ucData);                          // РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ СЃРєР»Р°РґС‹РІР°РµРј РІ РїР°РјСЏС‚СЊ
 	EEPROM_write (uiAddress + 0x01 ,ucData >> 8);
 	EEPROM_write (uiAddress + 0x02 ,ucData >> 16);
 	EEPROM_write (uiAddress + 0x03 ,ucData >> 24);
 }
 
-void EEPROM_write_float (uint16_t uiAddress, double ucData)        // запись float. 
+void EEPROM_write_float (uint16_t uiAddress, double ucData)        // Р·Р°РїРёСЃСЊ float. 
 {
-     static union                                                  // создаем объеденение
+     static union                                                  // СЃРѕР·РґР°РµРј РѕР±СЉРµРґРµРЅРµРЅРёРµ
      { 
-         double in_float;                                          // два числа которые начинаются с одного адресса но имеют разный тип
-         uint32_t out_float;                                       // мы флоат записываем как флоат, а потом при записи в еепром уже пользуемся 32 бит переменной
+         double in_float;                                          // РґРІР° С‡РёСЃР»Р° РєРѕС‚РѕСЂС‹Рµ РЅР°С‡РёРЅР°СЋС‚СЃСЏ СЃ РѕРґРЅРѕРіРѕ Р°РґСЂРµСЃСЃР° РЅРѕ РёРјРµСЋС‚ СЂР°Р·РЅС‹Р№ С‚РёРї
+         uint32_t out_float;                                       // РјС‹ С„Р»РѕР°С‚ Р·Р°РїРёСЃС‹РІР°РµРј РєР°Рє С„Р»РѕР°С‚, Р° РїРѕС‚РѕРј РїСЂРё Р·Р°РїРёСЃРё РІ РµРµРїСЂРѕРј СѓР¶Рµ РїРѕР»СЊР·СѓРµРјСЃСЏ 32 Р±РёС‚ РїРµСЂРµРјРµРЅРЅРѕР№
      }floatchik;
      floatchik.in_float = ucData;                                 
-     EEPROM_write (uiAddress,floatchik.out_float);                          // в обратном порядке складываем в память
+     EEPROM_write (uiAddress,floatchik.out_float);                          // РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ СЃРєР»Р°РґС‹РІР°РµРј РІ РїР°РјСЏС‚СЊ
      EEPROM_write (uiAddress + 0x01 ,floatchik.out_float >> 8);
      EEPROM_write (uiAddress + 0x02 ,floatchik.out_float >> 16);
      EEPROM_write (uiAddress + 0x03 ,floatchik.out_float >> 24);
 }
 
-double EEPROM_read_float (uint16_t uiAddress)                       // вычитываем float
+double EEPROM_read_float (uint16_t uiAddress)                       // РІС‹С‡РёС‚С‹РІР°РµРј float
 {
-     static union                                                   // так же само, создаем объеденение, и обращаемся к одним и тем же данным по разному
+     static union                                                   // С‚Р°Рє Р¶Рµ СЃР°РјРѕ, СЃРѕР·РґР°РµРј РѕР±СЉРµРґРµРЅРµРЅРёРµ, Рё РѕР±СЂР°С‰Р°РµРјСЃСЏ Рє РѕРґРЅРёРј Рё С‚РµРј Р¶Рµ РґР°РЅРЅС‹Рј РїРѕ СЂР°Р·РЅРѕРјСѓ
      {
           double in_float;
           uint32_t out_float;
      }floatchik;
-	floatchik.out_float = EEPROM_read (uiAddress+0x03);                // считали в нее старшый байт
-	floatchik.out_float = floatchik.out_float << 8;                    // сдвинули освободив место под младший
-	floatchik.out_float |= EEPROM_read (uiAddress+0x02);               // считали второй байт и присвоили без изменения других битов
-	floatchik.out_float = floatchik.out_float << 8;                    // сдвинули
+	floatchik.out_float = EEPROM_read (uiAddress+0x03);                // СЃС‡РёС‚Р°Р»Рё РІ РЅРµРµ СЃС‚Р°СЂС€С‹Р№ Р±Р°Р№С‚
+	floatchik.out_float = floatchik.out_float << 8;                    // СЃРґРІРёРЅСѓР»Рё РѕСЃРІРѕР±РѕРґРёРІ РјРµСЃС‚Рѕ РїРѕРґ РјР»Р°РґС€РёР№
+	floatchik.out_float |= EEPROM_read (uiAddress+0x02);               // СЃС‡РёС‚Р°Р»Рё РІС‚РѕСЂРѕР№ Р±Р°Р№С‚ Рё РїСЂРёСЃРІРѕРёР»Рё Р±РµР· РёР·РјРµРЅРµРЅРёСЏ РґСЂСѓРіРёС… Р±РёС‚РѕРІ
+	floatchik.out_float = floatchik.out_float << 8;                    // СЃРґРІРёРЅСѓР»Рё
 	floatchik.out_float |= EEPROM_read (uiAddress+0x01);
 	floatchik.out_float = floatchik.out_float << 8;
 	floatchik.out_float |= EEPROM_read (uiAddress);
-	return floatchik.in_float;                                         // вернули итог типа флоат
+	return floatchik.in_float;                                         // РІРµСЂРЅСѓР»Рё РёС‚РѕРі С‚РёРїР° С„Р»РѕР°С‚
 }
 
-uint16_t EEPROM_read_16t (uint16_t uiAddress)                 // тоже самое только для 16 бит
+uint16_t EEPROM_read_16t (uint16_t uiAddress)                 // С‚РѕР¶Рµ СЃР°РјРѕРµ С‚РѕР»СЊРєРѕ РґР»СЏ 16 Р±РёС‚
 {
 	static uint32_t receive_data;
 	receive_data |= EEPROM_read (uiAddress+0x01);
@@ -99,7 +99,7 @@ void EEPROM_write_16t (uint16_t uiAddress, uint16_t ucData)
 }
 
 
-void init_EEprom (void)                                       // инициализация еепром, забиваем стандартные значения
+void init_EEprom (void)                                       // РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РµРµРїСЂРѕРј, Р·Р°Р±РёРІР°РµРј СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
 {
     EEPROM_write(EE_LIGHT,2);
     EEPROM_write(EE_DISCKRET1,2);
@@ -166,7 +166,7 @@ void eeprom_calib_sens (void)
     EEPROM_write_float(EE_KALIBSENSOR12,metrology.koef_sensor12);     
 }   
 
-void read_ALL_EEprom (void)                                   // считываем значение из еепром при старте для всех переменных 
+void read_ALL_EEprom (void)                                   // СЃС‡РёС‚С‹РІР°РµРј Р·РЅР°С‡РµРЅРёРµ РёР· РµРµРїСЂРѕРј РїСЂРё СЃС‚Р°СЂС‚Рµ РґР»СЏ РІСЃРµС… РїРµСЂРµРјРµРЅРЅС‹С… 
 {
     	param.discret1              = EEPROM_read(EE_DISCKRET1);
     	param.discret2              = EEPROM_read(EE_DISCKRET2);;
@@ -221,7 +221,7 @@ void read_ALL_EEprom (void)                                   // считываем значе
         
 }
 
-void init_err36 (void)                                      // с помощью спец пароля можно сбросить ерр36 (для разработчиков) 
+void init_err36 (void)                                      // СЃ РїРѕРјРѕС‰СЊСЋ СЃРїРµС† РїР°СЂРѕР»СЏ РјРѕР¶РЅРѕ СЃР±СЂРѕСЃРёС‚СЊ РµСЂСЂ36 (РґР»СЏ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєРѕРІ) 
 {
      EEPROM_write(EE_ERRPR36,0);
      EEPROM_write_32t(EE_DATE1, 01);
@@ -230,7 +230,7 @@ void init_err36 (void)                                      // с помощью спец па
      EEPROM_write_32t(EE_PSWRD1,888888);
 }
 
-void write_no_pay (void)                                  // запись в еепром даты, месяца и года срабатывания блокировки                 
+void write_no_pay (void)                                  // Р·Р°РїРёСЃСЊ РІ РµРµРїСЂРѕРј РґР°С‚С‹, РјРµСЃСЏС†Р° Рё РіРѕРґР° СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ Р±Р»РѕРєРёСЂРѕРІРєРё                 
 {
    EEPROM_write_32t(EE_DATE1,param.data_err);
    EEPROM_write_32t(EE_MOUNT1,param.mount_err);
